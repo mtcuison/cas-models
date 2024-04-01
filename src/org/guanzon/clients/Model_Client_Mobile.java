@@ -19,6 +19,7 @@ import org.rmj.appdriver.iface.GEntity;
 public class Model_Client_Mobile implements GEntity{
     Connection poConn;          //connection
     CachedRowSet poEntity;      //rowset
+    String psMessage;           //warning, success or error message
     
     public Model_Client_Mobile(Connection foValue){
         if (foValue == null){
@@ -98,30 +99,22 @@ public class Model_Client_Mobile implements GEntity{
     
     @Override
     public void setValue(int fnColumn, Object foValue) {
-        try {
-            poEntity.updateObject(fnColumn, foValue);
-            poEntity.updateRow();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void setValue(String fsColumn, Object foValue) {
-        try {
-            setValue(MiscUtil.getColumnIndex(poEntity, fsColumn), foValue);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     /**
      * Sets the ID of this record.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setMobileID(String fsValue){
-        setValue("sMobileID", fsValue);
+    public boolean setMobileID(String fsValue){
+        return setValuex("sMobileID", fsValue);
     }
     
     /** 
@@ -135,9 +128,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets the Owner ID of this record.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setClientID(String fsValue){
-        setValue("sClientID", fsValue);
+    public boolean setClientID(String fsValue){
+        return setValuex("sClientID", fsValue);
     }
     
     /**
@@ -151,9 +145,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets the contact number.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setContactNo(String fsValue){
-        setValue("sMobileNo", fsValue);
+    public boolean setContactNo(String fsValue){
+        return setValuex("sMobileNo", fsValue);
     }
     
     /**
@@ -170,9 +165,10 @@ public class Model_Client_Mobile implements GEntity{
      * 2 for Fax Machine No.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setContactType(String fsValue){
-        setValue("cMobileTp", fsValue);
+    public boolean setContactType(String fsValue){
+        return setValuex("cMobileTp", fsValue);
     }
     
     /**
@@ -189,9 +185,10 @@ public class Model_Client_Mobile implements GEntity{
      * 2 for Others
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setOwnership(String fsValue){
-        setValue("cOwnerxxx", fsValue);
+    public boolean setOwnership(String fsValue){
+        return setValuex("cOwnerxxx", fsValue);
     }
     
     /**
@@ -205,9 +202,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets the contact number as Primary
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setPrimary(boolean fbValue){
-        setValue("cPrimaryx", fbValue ? "1" : "0");
+    public boolean setPrimary(boolean fbValue){
+        return setValuex("cPrimaryx", fbValue ? "1" : "0");
     }
     
     /**
@@ -221,9 +219,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets the priority number of the contact number.
      * 
      * @param fnValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setPriority(int fnValue){
-        setValue("nPriority", fnValue);
+    public boolean setPriority(int fnValue){
+        return setValuex("nPriority", fnValue);
     }
     
     /**
@@ -238,9 +237,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets if the contact number will be receiving marketing message.
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setMarketingRecipient(boolean fbValue){
-        setValue("cIncdMktg", fbValue ? "1" : "0");
+    public boolean setMarketingRecipient(boolean fbValue){
+        return setValuex("cIncdMktg", fbValue ? "1" : "0");
     }
     
     /**
@@ -258,9 +258,10 @@ public class Model_Client_Mobile implements GEntity{
      * 3 for DITO Telecom
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setMobileNetwork(String fsValue){
-        setValue("cSubscrbr", fsValue);
+    public boolean setMobileNetwork(String fsValue){
+        return setValuex("cSubscrbr", fsValue);
     }
     
     /**
@@ -274,9 +275,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets record as active.
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setActive(boolean fbValue){
-        setValue("cRecdStat", fbValue ? "1" : "0");
+    public boolean setActive(boolean fbValue){
+        return setValuex("cRecdStat", fbValue ? "1" : "0");
     }
     
     /**
@@ -290,9 +292,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets the user encoded/updated the record.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setModifiedBy(String fsValue){
-        setValue("sModified", fsValue);
+    public boolean setModifiedBy(String fsValue){
+        return setValuex("sModified", fsValue);
     }
     
     /**
@@ -306,9 +309,10 @@ public class Model_Client_Mobile implements GEntity{
      * Sets the date and time the record was modified.
      * 
      * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setModifiedDate(Date fdValue){
-        setValue("dModified", fdValue);
+    public boolean setModifiedDate(Date fdValue){
+        return setValuex("dModified", fdValue);
     }
     
     /**
@@ -316,6 +320,10 @@ public class Model_Client_Mobile implements GEntity{
      */
     public Date getModifiedDate(){
         return (Date) getValue("dModified");
+    }
+    
+    public String getMessage(){
+        return psMessage;
     }
     
     private String getSQL(){
@@ -374,4 +382,27 @@ public class Model_Client_Mobile implements GEntity{
             System.exit(1);
         }
     }    
+    
+    private boolean setValuex(int fnColumn, Object foValue) {
+        try {
+            poEntity.updateObject(fnColumn, foValue);
+            poEntity.updateRow();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            psMessage = e.getMessage();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean setValuex(String fsColumn, Object foValue) {
+        try {
+            setValuex(MiscUtil.getColumnIndex(poEntity, fsColumn), foValue);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            psMessage = e.getMessage();
+            return false;
+        }
+        return true;
+    }
 }

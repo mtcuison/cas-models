@@ -20,6 +20,7 @@ import org.rmj.appdriver.iface.GEntity;
 public class Model_Client_Master implements GEntity{
     Connection poConn;          //connection
     CachedRowSet poEntity;      //rowset
+    String psMessage;           //warning, success or error message
     
     public Model_Client_Master(Connection foValue){
         if (foValue == null){
@@ -99,30 +100,23 @@ public class Model_Client_Master implements GEntity{
     
     @Override
     public void setValue(int fnColumn, Object foValue) {
-        try {
-            poEntity.updateObject(fnColumn, foValue);
-            poEntity.updateRow();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void setValue(String fsColumn, Object foValue) {
-        try {
-            setValue(MiscUtil.getColumnIndex(poEntity, fsColumn), foValue);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     /**
      * Sets the ID of this record.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setClientID(String fsValue){
-        setValue("sClientID", fsValue);
+    public boolean setClientID(String fsValue){
+        setValuex("sClientID", fsValue);
+        return true;
     }
     
     /** 
@@ -138,9 +132,10 @@ public class Model_Client_Master implements GEntity{
      * 1 for Institution
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setClientType(String fsValue){
-        setValue("cClientTp", fsValue);
+    public boolean setClientType(String fsValue){
+        return setValuex("cClientTp", fsValue);
     }
     
     /**
@@ -154,9 +149,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the last name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setLastName(String fsValue){
-        setValue("sLastName", fsValue);
+    public boolean setLastName(String fsValue){
+        return setValuex("sLastName", fsValue);
     }
     
     /**
@@ -170,9 +166,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the first name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setFirstName(String fsValue){
-        setValue("sFrstName", fsValue);
+    public boolean setFirstName(String fsValue){
+        return setValuex("sFrstName", fsValue);
     }
     
     /**
@@ -186,9 +183,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the middle name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setMiddleName(String fsValue){
-        setValue("sMiddName", fsValue);
+    public boolean setMiddleName(String fsValue){
+        return setValuex("sMiddName", fsValue);
     }
     
     /**
@@ -202,9 +200,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the suffix name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setSuffixName(String fsValue){
-        setValue("sSuffixNm", fsValue);
+    public boolean setSuffixName(String fsValue){
+        return setValuex("sSuffixNm", fsValue);
     }
     
     /**
@@ -218,9 +217,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the complete name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setFullName(String fsValue){
-        setValue("sClientNm", fsValue);
+    public boolean setFullName(String fsValue){
+        return setValuex("sClientNm", fsValue);
     }
     
     /**
@@ -237,9 +237,10 @@ public class Model_Client_Master implements GEntity{
      * 2 for LGBT
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setSex(String fsValue){
-        setValue("cGenderCd", fsValue);
+    public boolean setSex(String fsValue){
+        return setValuex("cGenderCd", fsValue);
     }
     
     /**
@@ -259,9 +260,10 @@ public class Model_Client_Master implements GEntity{
      * 5 for Single Parent w/ Live-in Partner
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setCivilStatus(String fsValue){
-        setValue("cCvilStat", fsValue);
+    public boolean setCivilStatus(String fsValue){
+        return setValuex("cCvilStat", fsValue);
     }
     
     /**
@@ -275,9 +277,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the citizenship ID of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setCitizenshipID(String fsValue){
-        setValue("sCitizenx", fsValue);
+    public boolean setCitizenshipID(String fsValue){
+        return setValuex("sCitizenx", fsValue);
     }
     
     /**
@@ -291,9 +294,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the citizenship name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setCitizenshipName(String fsValue){
-        setValue("xCitizenx", fsValue);
+    public boolean setCitizenshipName(String fsValue){
+        return setValuex("xCitizenx", fsValue);
     }
     
     /**
@@ -307,9 +311,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the date of birth of the client.
      * 
      * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setBirthDate(Date fdValue){
-        setValue("dBirthDte", fdValue);
+    public boolean setBirthDate(Date fdValue){
+        return setValuex("dBirthDte", fdValue);
     }
     
     /**
@@ -323,9 +328,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the birth place ID of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setBirthPlaceID(String fsValue){
-        setValue("sBirthPlc", fsValue);
+    public boolean setBirthPlaceID(String fsValue){
+        return setValuex("sBirthPlc", fsValue);
     }
     
     /**
@@ -339,9 +345,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the birth place name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setBirthPlaceName(String fsValue){
-        setValue("xBirthPlc", fsValue);
+    public boolean setBirthPlaceName(String fsValue){
+        return setValuex("xBirthPlc", fsValue);
     }
     
     /**
@@ -355,9 +362,10 @@ public class Model_Client_Master implements GEntity{
      * Sets additional information for the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setAdditionalInfo(String fsValue){
-        setValue("sAddlInfo", fsValue);
+    public boolean setAdditionalInfo(String fsValue){
+        return setValuex("sAddlInfo", fsValue);
     }
     
     /** 
@@ -371,9 +379,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the spouse ID of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setSpouseID(String fsValue){
-        setValue("sSpouseID", fsValue);
+    public boolean setSpouseID(String fsValue){
+        return setValuex("sSpouseID", fsValue);
     }
     
     /**
@@ -387,9 +396,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the spouse name of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setSpouseName(String fsValue){
-        setValue("xSpouseNm", fsValue);
+    public boolean setSpouseName(String fsValue){
+        return setValuex("xSpouseNm", fsValue);
     }
     
     /**
@@ -403,9 +413,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the tax identification number of the client.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setTaxIDNumber(String fsValue){
-        setValue("sTaxIDNox", fsValue);
+    public boolean setTaxIDNumber(String fsValue){
+        return setValuex("sTaxIDNox", fsValue);
     }
     
     /**
@@ -419,9 +430,10 @@ public class Model_Client_Master implements GEntity{
      * Sets if the client has loan to the company.
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setLoanReceivableClient(boolean fbValue){
-        setValue("cLRClient", fbValue ? "1" : "0");
+    public boolean setLoanReceivableClient(boolean fbValue){
+        return setValuex("cLRClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -435,9 +447,10 @@ public class Model_Client_Master implements GEntity{
      * Sets if the client purchased motorcycle.
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setMotorcycleSalesClient(boolean fbValue){
-        setValue("cMCClient", fbValue ? "1" : "0");
+    public boolean setMotorcycleSalesClient(boolean fbValue){
+        return setValuex("cMCClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -451,9 +464,10 @@ public class Model_Client_Master implements GEntity{
      * Sets if the client is a job order customer.
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setServiceCenterClient(boolean fbValue){
-        setValue("cSCClient", fbValue ? "1" : "0");
+    public boolean setServiceCenterClient(boolean fbValue){
+        return setValuex("cSCClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -467,9 +481,10 @@ public class Model_Client_Master implements GEntity{
      * Sets if the client purchased spare parts.
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setSparepartsSalesClient(boolean fbValue){
-        setValue("cSPClient", fbValue ? "1" : "0");
+    public boolean setSparepartsSalesClient(boolean fbValue){
+        return setValuex("cSPClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -483,9 +498,10 @@ public class Model_Client_Master implements GEntity{
      * Sets if the client purchased mobile phone.
      * 
      * @param fbValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setCellphoneSalesClient(boolean fbValue){
-        setValue("cCPClient", fbValue ? "1" : "0");
+    public boolean setCellphoneSalesClient(boolean fbValue){
+        return setValuex("cCPClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -498,10 +514,11 @@ public class Model_Client_Master implements GEntity{
     /**
      * Sets record as active.
      * 
-     * @param fbValue 
+     * @param fbValue
+     * @return  True if the record assignment is successful.
      */
-    public void setActive(boolean fbValue){
-        setValue("cRecdStat", fbValue ? "1" : "0");
+    public boolean setActive(boolean fbValue){
+        return setValuex("cRecdStat", fbValue ? "1" : "0");
     }
     
     /**
@@ -515,9 +532,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the user encoded/updated the record.
      * 
      * @param fsValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setModifiedBy(String fsValue){
-        setValue("sModified", fsValue);
+    public boolean setModifiedBy(String fsValue){
+        return setValuex("sModified", fsValue);
     }
     
     /**
@@ -531,9 +549,10 @@ public class Model_Client_Master implements GEntity{
      * Sets the date and time the record was modified.
      * 
      * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public void setModifiedDate(Date fdValue){
-        setValue("dModified", fdValue);
+    public boolean setModifiedDate(Date fdValue){
+        return setValuex("dModified", fdValue);
     }
     
     /**
@@ -543,7 +562,11 @@ public class Model_Client_Master implements GEntity{
         return (Date) getValue("dModified");
     }
     
-    protected String getSQL(){
+    public String getMessage(){
+        return psMessage;
+    }
+    
+    private String getSQL(){
         return "SELECT" +
                     "  sClientID" +
                     ", cClientTp" +
@@ -574,7 +597,7 @@ public class Model_Client_Master implements GEntity{
                 " FROM " + getTable();
     }
     
-    protected void initialize(){
+    private void initialize(){
         String lsSQL = MiscUtil.addCondition(getSQL(), "0=1");
         
         try {
@@ -607,4 +630,27 @@ public class Model_Client_Master implements GEntity{
             System.exit(1);
         }
     }    
+    
+    private boolean setValuex(int fnColumn, Object foValue) {
+        try {
+            poEntity.updateObject(fnColumn, foValue);
+            poEntity.updateRow();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            psMessage = e.getMessage();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean setValuex(String fsColumn, Object foValue) {
+        try {
+            setValuex(MiscUtil.getColumnIndex(poEntity, fsColumn), foValue);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            psMessage = e.getMessage();
+            return false;
+        }
+        return true;
+    }
 }
