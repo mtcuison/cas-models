@@ -2,12 +2,9 @@ package org.guanzon.clients;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.RowSetProvider;
 import org.rmj.appdriver.MiscUtil;
 import org.rmj.appdriver.constants.RecordStatus;
 import org.rmj.appdriver.constants.Logical;
@@ -18,6 +15,8 @@ import org.rmj.appdriver.iface.GEntity;
  * @author Michael Cuison
  */
 public class Model_Client_Master implements GEntity{
+    final String XML = "Model_Client_Master.xml";
+    
     Connection poConn;          //connection
     CachedRowSet poEntity;      //rowset
     String psMessage;           //warning, success or error message
@@ -566,47 +565,43 @@ public class Model_Client_Master implements GEntity{
         return psMessage;
     }
     
-    private String getSQL(){
-        return "SELECT" +
-                    "  sClientID" +
-                    ", cClientTp" +
-                    ", sLastName" +
-                    ", sFrstName" +
-                    ", sMiddName" +
-                    ", sSuffixNm" +
-                    ", sClientNm" +
-                    ", cGenderCd" +
-                    ", cCvilStat" +
-                    ", sCitizenx" +
-                    ", dBirthDte" +
-                    ", sBirthPlc" +
-                    ", sAddlInfo" +
-                    ", sSpouseID" +
-                    ", sTaxIDNox" +
-                    ", cLRClient" +
-                    ", cMCClient" +
-                    ", cSCClient" +
-                    ", cSPClient" +
-                    ", cCPClient" +
-                    ", cRecdStat" +
-                    ", sModified" +
-                    ", dModified" +
-                    ", '' xBirthPlc" +
-                    ", '' xCitizenx" +
-                    ", '' xSpouseNm" +
-                " FROM " + getTable();
-    }
+//    private String getSQL(){
+//        return "SELECT" +
+//                    "  sClientID" +
+//                    ", cClientTp" +
+//                    ", sLastName" +
+//                    ", sFrstName" +
+//                    ", sMiddName" +
+//                    ", sSuffixNm" +
+//                    ", sMaidenNm" +
+//                    ", sCompnyNm" +
+//                    ", cGenderCd" +
+//                    ", cCvilStat" +
+//                    ", sCitizenx" +
+//                    ", dBirthDte" +
+//                    ", sBirthPlc" +
+//                    ", sAddlInfo" +
+//                    ", sSpouseID" +
+//                    ", sTaxIDNox" +
+//                    ", sLTOIDxxx" +
+//                    ", sPHBNIDxx" +
+//                    ", cLRClient" +
+//                    ", cMCClient" +
+//                    ", cSCClient" +
+//                    ", cSPClient" +
+//                    ", cCPClient" +
+//                    ", cRecdStat" +
+//                    ", sModified" +
+//                    ", dModified" +
+//                    ", '' xBirthPlc" +
+//                    ", '' xCitizenx" +
+//                    ", '' xSpouseNm" +
+//                " FROM " + getTable();
+//    }
     
-    private void initialize(){
-        String lsSQL = MiscUtil.addCondition(getSQL(), "0=1");
-        
+    private void initialize(){        
         try {
-            Statement loSt = poConn.createStatement();
-            ResultSet loRS = loSt.executeQuery(lsSQL);
-            
-            poEntity = RowSetProvider.newFactory().createCachedRowSet();
-            poEntity.populate(loRS);
-            MiscUtil.close(loRS);
+            poEntity = MiscUtil.xml2ResultSet(System.getProperty("sys.default.path.metadata") + XML, getTable());
             
             poEntity.last();
             poEntity.moveToInsertRow();
