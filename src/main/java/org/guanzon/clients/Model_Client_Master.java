@@ -9,9 +9,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
+import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.base.SQLUtil;
+import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GEntity;
@@ -21,10 +26,15 @@ import org.json.simple.JSONObject;
  * @author Michael Cuison
  */
 public class Model_Client_Master implements GEntity{
+    
+    final String XML = "Model_Client_Master.xml";
     Connection poConn;          //connection
     CachedRowSet poEntity;      //rowset
     String psMessage;           //warning, success or error message
-    
+           //warning, success or error message
+    GRider poGRider;
+    int pnEditMode;
+    public JSONObject poJSON;
     public Model_Client_Master(Connection foValue){
         if (foValue == null){
             System.err.println("Database connection is not set.");
@@ -109,7 +119,7 @@ public class Model_Client_Master implements GEntity{
      * @return  True if the record assignment is successful.
      */
     public boolean setClientID(String fsValue){
-        setValuex("sClientID", fsValue);
+        setValue("sClientID", fsValue);
         return true;
     }
     
@@ -128,8 +138,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setClientType(String fsValue){
-        return setValuex("cClientTp", fsValue);
+    public JSONObject setClientType(String fsValue){
+        return setValue("cClientTp", fsValue);
     }
     
     /**
@@ -145,8 +155,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setLastName(String fsValue){
-        return setValuex("sLastName", fsValue);
+    public JSONObject setLastName(String fsValue){
+        return setValue("sLastName", fsValue);
     }
     
     /**
@@ -162,8 +172,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setFirstName(String fsValue){
-        return setValuex("sFrstName", fsValue);
+    public JSONObject setFirstName(String fsValue){
+        return setValue("sFrstName", fsValue);
     }
     
     /**
@@ -179,8 +189,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setMiddleName(String fsValue){
-        return setValuex("sMiddName", fsValue);
+    public JSONObject setMiddleName(String fsValue){
+        return setValue("sMiddName", fsValue);
     }
     
     /**
@@ -196,8 +206,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setSuffixName(String fsValue){
-        return setValuex("sSuffixNm", fsValue);
+    public JSONObject setSuffixName(String fsValue){
+        return setValue("sSuffixNm", fsValue);
     }
     
     /**
@@ -213,8 +223,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setFullName(String fsValue){
-        return setValuex("sClientNm", fsValue);
+    public JSONObject setFullName(String fsValue){
+        return setValue("sClientNm", fsValue);
     }
     
     /**
@@ -233,8 +243,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setSex(String fsValue){
-        return setValuex("cGenderCd", fsValue);
+    public JSONObject setSex(String fsValue){
+        return setValue("cGenderCd", fsValue);
     }
     
     /**
@@ -256,8 +266,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setCivilStatus(String fsValue){
-        return setValuex("cCvilStat", fsValue);
+    public JSONObject setCivilStatus(String fsValue){
+        return setValue("cCvilStat", fsValue);
     }
     
     /**
@@ -273,8 +283,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setCitizenshipID(String fsValue){
-        return setValuex("sCitizenx", fsValue);
+    public JSONObject setCitizenshipID(String fsValue){
+        return setValue("sCitizenx", fsValue);
     }
     
     /**
@@ -290,8 +300,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setCitizenshipName(String fsValue){
-        return setValuex("xCitizenx", fsValue);
+    public JSONObject setCitizenshipName(String fsValue){
+        return setValue("xCitizenx", fsValue);
     }
     
     /**
@@ -307,8 +317,8 @@ public class Model_Client_Master implements GEntity{
      * @param fdValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setBirthDate(Date fdValue){
-        return setValuex("dBirthDte", fdValue);
+    public JSONObject setBirthDate(Date fdValue){
+        return setValue("dBirthDte", fdValue);
     }
     
     /**
@@ -324,8 +334,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setBirthPlaceID(String fsValue){
-        return setValuex("sBirthPlc", fsValue);
+    public JSONObject setBirthPlaceID(String fsValue){
+        return setValue("sBirthPlc", fsValue);
     }
     
     /**
@@ -341,8 +351,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setBirthPlaceName(String fsValue){
-        return setValuex("xBirthPlc", fsValue);
+    public JSONObject setBirthPlaceName(String fsValue){
+        return setValue("xBirthPlc", fsValue);
     }
     
     /**
@@ -358,8 +368,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setAdditionalInfo(String fsValue){
-        return setValuex("sAddlInfo", fsValue);
+    public JSONObject setAdditionalInfo(String fsValue){
+        return setValue("sAddlInfo", fsValue);
     }
     
     /** 
@@ -375,8 +385,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setSpouseID(String fsValue){
-        return setValuex("sSpouseID", fsValue);
+    public JSONObject setSpouseID(String fsValue){
+        return setValue("sSpouseID", fsValue);
     }
     
     /**
@@ -392,8 +402,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setSpouseName(String fsValue){
-        return setValuex("xSpouseNm", fsValue);
+    public JSONObject setSpouseName(String fsValue){
+        return setValue("xSpouseNm", fsValue);
     }
     
     /**
@@ -409,8 +419,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setTaxIDNumber(String fsValue){
-        return setValuex("sTaxIDNox", fsValue);
+    public JSONObject setTaxIDNumber(String fsValue){
+        return setValue("sTaxIDNox", fsValue);
     }
     
     /**
@@ -426,8 +436,8 @@ public class Model_Client_Master implements GEntity{
      * @param fbValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setLoanReceivableClient(boolean fbValue){
-        return setValuex("cLRClient", fbValue ? "1" : "0");
+    public JSONObject setLoanReceivableClient(boolean fbValue){
+        return setValue("cLRClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -443,8 +453,8 @@ public class Model_Client_Master implements GEntity{
      * @param fbValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setMotorcycleSalesClient(boolean fbValue){
-        return setValuex("cMCClient", fbValue ? "1" : "0");
+    public JSONObject setMotorcycleSalesClient(boolean fbValue){
+        return setValue("cMCClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -460,8 +470,8 @@ public class Model_Client_Master implements GEntity{
      * @param fbValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setServiceCenterClient(boolean fbValue){
-        return setValuex("cSCClient", fbValue ? "1" : "0");
+    public JSONObject setServiceCenterClient(boolean fbValue){
+        return setValue("cSCClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -477,8 +487,8 @@ public class Model_Client_Master implements GEntity{
      * @param fbValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setSparepartsSalesClient(boolean fbValue){
-        return setValuex("cSPClient", fbValue ? "1" : "0");
+    public JSONObject setSparepartsSalesClient(boolean fbValue){
+        return setValue("cSPClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -494,8 +504,8 @@ public class Model_Client_Master implements GEntity{
      * @param fbValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setCellphoneSalesClient(boolean fbValue){
-        return setValuex("cCPClient", fbValue ? "1" : "0");
+    public JSONObject setCellphoneSalesClient(boolean fbValue){
+        return setValue("cCPClient", fbValue ? "1" : "0");
     }
     
     /**
@@ -511,8 +521,8 @@ public class Model_Client_Master implements GEntity{
      * @param fbValue
      * @return  True if the record assignment is successful.
      */
-    public boolean setActive(boolean fbValue){
-        return setValuex("cRecdStat", fbValue ? "1" : "0");
+    public JSONObject setActive(boolean fbValue){
+        return setValue("cRecdStat", fbValue ? "1" : "0");
     }
     
     /**
@@ -528,8 +538,8 @@ public class Model_Client_Master implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setModifiedBy(String fsValue){
-        return setValuex("sModified", fsValue);
+    public JSONObject setModifiedBy(String fsValue){
+        return setValue("sModified", fsValue);
     }
     
     /**
@@ -545,8 +555,8 @@ public class Model_Client_Master implements GEntity{
      * @param fdValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setModifiedDate(Date fdValue){
-        return setValuex("dModified", fdValue);
+    public JSONObject setModifiedDate(Date fdValue){
+        return setValue("dModified", fdValue);
     }
     
     /**
@@ -592,15 +602,12 @@ public class Model_Client_Master implements GEntity{
     }
     
     private void initialize(){
-        String lsSQL = MiscUtil.addCondition(getSQL(), "0=1");
+        
+            
         
         try {
-            Statement loSt = poConn.createStatement();
-            ResultSet loRS = loSt.executeQuery(lsSQL);
             
-            poEntity = RowSetProvider.newFactory().createCachedRowSet();
-            poEntity.populate(loRS);
-            MiscUtil.close(loRS);
+            poEntity = MiscUtil.xml2ResultSet(System.getProperty("sys.default.path.metadata") + XML, getTable());
             
             poEntity.last();
             poEntity.moveToInsertRow();
@@ -625,52 +632,119 @@ public class Model_Client_Master implements GEntity{
         }
     }    
     
-    private boolean setValuex(int fnColumn, Object foValue) {
-        try {
-            poEntity.updateObject(fnColumn, foValue);
-            poEntity.updateRow();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            psMessage = e.getMessage();
-            return false;
-        }
-        return true;
-    }
-
-    private boolean setValuex(String fsColumn, Object foValue) {
-        try {
-            setValuex(MiscUtil.getColumnIndex(poEntity, fsColumn), foValue);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            psMessage = e.getMessage();
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public JSONObject newRecord() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        pnEditMode = EditMode.ADDNEW;
+        poJSON = new JSONObject();
+        poJSON.put("result", "success");
+        return poJSON;
     }
 
     @Override
-    public JSONObject openRecord(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public JSONObject openRecord(String fsValue) { pnEditMode = EditMode.UPDATE;
+        poJSON = new JSONObject();
+
+        String lsSQL = MiscUtil.makeSelect(this);
+        lsSQL = MiscUtil.addCondition(lsSQL, "sMobileID = " + SQLUtil.toSQL(fsValue));
+
+        ResultSet loRS = poGRider.executeQuery(lsSQL);
+
+        try {
+            if (loRS.next()){
+                for (int lnCtr = 1; lnCtr <= loRS.getMetaData().getColumnCount(); lnCtr++){
+                    setValue(lnCtr, loRS.getObject(lnCtr));
+                }
+
+                pnEditMode = EditMode.UPDATE;
+
+                poJSON.put("result", "success");
+                poJSON.put("message", "Record loaded successfully.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "No record to load.");
+            }
+        } catch (SQLException e) {
+            poJSON.put("result", "error");
+            poJSON.put("message", e.getMessage());
+        }
+
+        return poJSON;
     }
 
     @Override
-    public JSONObject saveRecord() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public JSONObject saveRecord() {String lsSQL;
+        
+        poJSON =  new JSONObject();
+        try {
+            lsSQL = MiscUtil.rowset2SQL(poEntity, 
+                    getTable(),
+                    "",
+                    "");
+        
+            if (pnEditMode == EditMode.ADDNEW){           
+                lsSQL = MiscUtil.getNextCode(getTable(), "sClientID", false, poGRider.getConnection(), "");
+                poEntity.updateObject("sClientID", lsSQL);
+                poEntity.updateRow();
+
+                lsSQL = MiscUtil.rowset2SQL(poEntity, getTable(), "");
+            } else {            
+                lsSQL = MiscUtil.rowset2SQL(poEntity, 
+                                            getTable(), 
+                                            "", 
+                                            "sClientID = " + SQLUtil.toSQL(poEntity.getString("sClientID")));
+            }
+            
+            if (!lsSQL.equals("")){
+                if(poGRider.executeQuery(lsSQL, getTable(), "", "") == 0){
+                    if(!poGRider.getErrMsg().isEmpty()){ 
+                        poJSON.put("result", "error");
+                        poJSON.put("message", poGRider.getErrMsg());
+                        return poJSON;
+                    }
+                }else {
+                    poJSON.put("result", "error");
+                    poJSON.put("message", "No record updated");
+                    return poJSON;
+                }
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Model_Client_Mobile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return poJSON;
+    }
+    @Override
+    public JSONObject setValue(int lnColumn, Object foValue) {
+        
+            poJSON = new JSONObject();
+        try {
+            poEntity.updateObject(lnColumn, foValue);
+            poEntity.updateRow();
+            poJSON.put("result", getValue(lnColumn));
+            return poJSON;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            psMessage = e.getMessage();
+            poJSON.put("result", "error");
+            poJSON.put("message", e.getMessage());
+            return poJSON;
+        }
     }
 
     @Override
-    public JSONObject setValue(int i, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public JSONObject setValue(String string, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public JSONObject setValue(String string, Object foValue) {
+        try {
+            return setValue(MiscUtil.getColumnIndex(poEntity, string), foValue);
+        } catch (SQLException ex) {
+            
+            poJSON = new JSONObject();
+            poJSON.put("result", "error");
+            poJSON.put("message", ex.getMessage());
+            return poJSON;
+            
+        }
+        
     }
 
 }

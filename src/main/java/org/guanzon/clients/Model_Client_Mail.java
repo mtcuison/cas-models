@@ -5,9 +5,14 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
+import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.base.SQLUtil;
+import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
@@ -18,16 +23,24 @@ import org.json.simple.JSONObject;
  * @author Michael Cuison
  */
 public class Model_Client_Mail implements GEntity{
+    
+    final String XML = "Model_Client_Mail.xml";
     Connection poConn;          //connection
     CachedRowSet poEntity;      //rowset
     String psMessage;           //warning, success or error message
     
-    public Model_Client_Mail(Connection foValue){
+    
+    GRider poGRider;
+    int pnEditMode;
+    public JSONObject poJSON;
+    
+    public Model_Client_Mail(Connection foValue, GRider poValue){
         if (foValue == null){
             System.err.println("Database connection is not set.");
             System.exit(1);
         }
-        
+        pnEditMode = EditMode.UNKNOWN;
+        poGRider = poValue;
         poConn = foValue;
         
         initialize();
@@ -80,8 +93,8 @@ public class Model_Client_Mail implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setClientID(String fsValue){
-        return setValuex("sClientID", fsValue);
+    public JSONObject setClientID(String fsValue){
+        return setValue("sClientID", fsValue);
     }
     
     /**
@@ -97,8 +110,8 @@ public class Model_Client_Mail implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setEntryNo(int fsValue){
-        return setValuex("nEntryNox", fsValue);
+    public JSONObject setEntryNo(int fsValue){
+        return setValue("nEntryNox", fsValue);
     }
     
     /**
@@ -114,8 +127,8 @@ public class Model_Client_Mail implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setEmail(String fsValue){
-        return setValuex("sEmailAdd", fsValue);
+    public JSONObject setEmail(String fsValue){
+        return setValue("sEmailAdd", fsValue);
     }
     
     /**
@@ -131,8 +144,8 @@ public class Model_Client_Mail implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setPriority(int fsValue){
-        return setValuex("nPriority", fsValue);
+    public JSONObject setPriority(int fsValue){
+        return setValue("nPriority", fsValue);
     }
     
     /**
@@ -143,13 +156,23 @@ public class Model_Client_Mail implements GEntity{
     }
     
     @Override
-    public Object getValue(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Object getValue(int fnColumn) {
+        try {
+            return poEntity.getObject(fnColumn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
-    public Object getValue(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Object getValue(String fsColumn) {
+        try {
+            return poEntity.getObject(fsColumn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private String getSQL(){
@@ -161,22 +184,14 @@ public class Model_Client_Mail implements GEntity{
                 " FROM " + getTable();
     }
     private void initialize(){
-        String lsSQL = MiscUtil.addCondition(getSQL(), "0=1");
         
         try {
-            Statement loSt = poConn.createStatement();
-            ResultSet loRS = loSt.executeQuery(lsSQL);
-            
-            poEntity = RowSetProvider.newFactory().createCachedRowSet();
-            poEntity.populate(loRS);
-            MiscUtil.close(loRS);
+            poEntity = MiscUtil.xml2ResultSet(System.getProperty("sys.default.path.metadata") + XML, getTable());
             
             poEntity.last();
             poEntity.moveToInsertRow();
 
-            MiscUtil.initRowSet(poEntity);
-            poEntity.updateInt("nEntryNox", 1);
-            poEntity.updateInt("nPriority", 1);
+            MiscUtil.initRowSet(poEntity);   
             
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -188,52 +203,119 @@ public class Model_Client_Mail implements GEntity{
         }
     } 
     
-   private boolean setValuex(int fnColumn, Object foValue) {
-        try {
-            poEntity.updateObject(fnColumn, foValue);
-            poEntity.updateRow();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            psMessage = e.getMessage();
-            return false;
-        }
-        return true;
-    }
-
-    private boolean setValuex(String fsColumn, Object foValue) {
-        try {
-            setValuex(MiscUtil.getColumnIndex(poEntity, fsColumn), foValue);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            psMessage = e.getMessage();
-            return false;
-        }
-        return true;
-    }
-
+  
     @Override
     public JSONObject newRecord() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        pnEditMode = EditMode.ADDNEW;
+        poJSON = new JSONObject();
+        poJSON.put("result", "success");
+        return poJSON;
     }
 
     @Override
-    public JSONObject openRecord(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public JSONObject openRecord(String fsValue) { pnEditMode = EditMode.UPDATE;
+        poJSON = new JSONObject();
+
+        String lsSQL = MiscUtil.makeSelect(this);
+        lsSQL = MiscUtil.addCondition(lsSQL, "sEmailIDx = " + SQLUtil.toSQL(fsValue));
+
+        ResultSet loRS = poGRider.executeQuery(lsSQL);
+
+        try {
+            if (loRS.next()){
+                for (int lnCtr = 1; lnCtr <= loRS.getMetaData().getColumnCount(); lnCtr++){
+                    setValue(lnCtr, loRS.getObject(lnCtr));
+                }
+
+                pnEditMode = EditMode.UPDATE;
+
+                poJSON.put("result", "success");
+                poJSON.put("message", "Record loaded successfully.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "No record to load.");
+            }
+        } catch (SQLException e) {
+            poJSON.put("result", "error");
+            poJSON.put("message", e.getMessage());
+        }
+
+        return poJSON;
     }
 
     @Override
-    public JSONObject saveRecord() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public JSONObject saveRecord() {String lsSQL;
+        
+        poJSON =  new JSONObject();
+        try {
+            lsSQL = MiscUtil.rowset2SQL(poEntity, 
+                    getTable(),
+                    "",
+                    "");
+        
+            if (pnEditMode == EditMode.ADDNEW){           
+                lsSQL = MiscUtil.getNextCode(getTable(), "sEmailIDx", false, poGRider.getConnection(), "");
+                poEntity.updateObject("sEmailIDx", lsSQL);
+                poEntity.updateRow();
+
+                lsSQL = MiscUtil.rowset2SQL(poEntity, getTable(), "");
+            } else {            
+                lsSQL = MiscUtil.rowset2SQL(poEntity, 
+                                            getTable(), 
+                                            "", 
+                                            "sEmailIDx = " + SQLUtil.toSQL(poEntity.getString("sEmailIDx")));
+            }
+            
+            if (!lsSQL.equals("")){
+                if(poGRider.executeQuery(lsSQL, getTable(), "", "") == 0){
+                    if(!poGRider.getErrMsg().isEmpty()){ 
+                        poJSON.put("result", "error");
+                        poJSON.put("message", poGRider.getErrMsg());
+                        return poJSON;
+                    }
+                }else {
+                    poJSON.put("result", "error");
+                    poJSON.put("message", "No record updated");
+                    return poJSON;
+                }
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Model_Client_Mobile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return poJSON;
+    }
+    @Override
+    public JSONObject setValue(int lnColumn, Object foValue) {
+        
+            poJSON = new JSONObject();
+        try {
+            poEntity.updateObject(lnColumn, foValue);
+            poEntity.updateRow();
+            poJSON.put("result", getValue(lnColumn));
+            return poJSON;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            psMessage = e.getMessage();
+            poJSON.put("result", "error");
+            poJSON.put("message", e.getMessage());
+            return poJSON;
+        }
     }
 
     @Override
-    public JSONObject setValue(int i, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public JSONObject setValue(String string, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public JSONObject setValue(String string, Object foValue) {
+        try {
+            return setValue(MiscUtil.getColumnIndex(poEntity, string), foValue);
+        } catch (SQLException ex) {
+            
+            poJSON = new JSONObject();
+            poJSON.put("result", "error");
+            poJSON.put("message", ex.getMessage());
+            return poJSON;
+            
+        }
+        
     }
     
 }
