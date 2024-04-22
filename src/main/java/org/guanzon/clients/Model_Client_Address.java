@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
+import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -112,6 +113,24 @@ public class Model_Client_Address implements GEntity{
         return null;
     }
 
+
+    
+    /**
+     * Sets the AddressID of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public JSONObject setAddressID(String fsValue){
+        return setValue("sAddrssID", fsValue);
+    }
+    
+    /** 
+     * @return The AddressID of this record. 
+     */
+    public String getAddressID(){
+        return (String) getValue("sAddrssID");
+    }
     
     /**
      * Sets the ClientID of this record.
@@ -324,13 +343,12 @@ public class Model_Client_Address implements GEntity{
     }
         private String getSQL(){
         return "SELECT" +
+                    ", sAddrssID" +
                     ", sClientID" +
-                    ", nEntryNox" +
                     ", sHouseNox" +
                     ", sAddressx" +
-                    ", sTownIDxx" +
                     ", sBrgyIDxx" +
-                    ", nPriority" +
+                    ", sTownIDxx" +
                     ", nLatitude" +
                     ", nLongitud" +
                     ", cPrimaryx" +
@@ -365,6 +383,10 @@ public class Model_Client_Address implements GEntity{
     @Override
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
+        
+        //replace with the primary key column info
+        setAddressID(MiscUtil.getNextCode(getTable(), "sAddrssID", true, poGRider.getConnection(), poGRider.getBranchCode()));
+        
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -403,45 +425,63 @@ public class Model_Client_Address implements GEntity{
 
     @Override
     public JSONObject saveRecord() {
-        String lsSQL;
+        poJSON = new JSONObject();
         
-        poJSON =  new JSONObject();
-        try {
-            lsSQL = MiscUtil.rowset2SQL(poEntity, 
-                    getTable(),
-                    "",
-                    "");
-        
-            if (pnEditMode == EditMode.ADDNEW){           
-                lsSQL = MiscUtil.getNextCode(getTable(), "sAddrssID", false, poGRider.getConnection(), "");
-                poEntity.updateObject("sAddrssID", lsSQL);
-                poEntity.updateRow();
-
-                lsSQL = MiscUtil.rowset2SQL(poEntity, getTable(), "");
-            } else {            
-                lsSQL = MiscUtil.rowset2SQL(poEntity, 
-                                            getTable(), 
-                                            "", 
-                                            "sAddrssID = " + SQLUtil.toSQL(poEntity.getString("sAddrssID")));
-            }
-            
-            if (!lsSQL.equals("")){
-                if(poGRider.executeQuery(lsSQL, getTable(), "", "") == 0){
-                    if(!poGRider.getErrMsg().isEmpty()){ 
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
+            String lsSQL;
+            if (pnEditMode == EditMode.ADDNEW){
+                //replace with the primary key column info
+                setAddressID(MiscUtil.getNextCode(getTable(), "sAddrssID", true, poGRider.getConnection(), poGRider.getBranchCode()));
+                
+                setModifiedDate(poGRider.getServerDate());
+                lsSQL = MiscUtil.makeSQL(this, "xBrgyName»xTownName»xProvName");
+                
+                if (!lsSQL.isEmpty()){
+                    if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
+                        poJSON.put("result", "success");
+                        poJSON.put("message", "Record saved successfully.");
+                    } else {
                         poJSON.put("result", "error");
                         poJSON.put("message", poGRider.getErrMsg());
-                        return poJSON;
                     }
-                }else {
+                } else {
                     poJSON.put("result", "error");
-                    poJSON.put("message", "No record updated");
-                    return poJSON;
+                    poJSON.put("message", "No record to save.");
+                }
+            } else {
+                Model_Client_Address loOldEntity = new Model_Client_Address(poConn, poGRider);
+                
+                setModifiedDate(poGRider.getServerDate());
+                //replace with the primary key column info
+                JSONObject loJSON = loOldEntity.openRecord(this.getAddressID());
+                
+                if ("success".equals((String) loJSON.get("result"))){
+                    //replace the condition based on the primary key column of the record
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sAddrssID = " + SQLUtil.toSQL(this.getAddress()), "xBrgyName»xTownName»xProvName");
+                    
+                    if (!lsSQL.isEmpty()){
+                        if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
+                            poJSON.put("result", "success");
+                            poJSON.put("message", "Record saved successfully.");
+                        } else {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", poGRider.getErrMsg());
+                        }
+                    } else {
+                        poJSON.put("result", "success");
+                        poJSON.put("message", "No updates has been made.");
+                    }
+                } else {
+                    poJSON.put("result", "error");
+                    poJSON.put("message", "Record discrepancy. Unable to save record.");
                 }
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(Model_Client_Mobile.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            poJSON.put("result", "error");
+            poJSON.put("message", "Invalid update mode. Unable to save record.");
+            return poJSON;
         }
+        
         return poJSON;
 
     }
@@ -453,7 +493,8 @@ public class Model_Client_Address implements GEntity{
         try {
             poEntity.updateObject(lnColumn, foValue);
             poEntity.updateRow();
-            poJSON.put("result", getValue(lnColumn));
+            poJSON.put("result", "success");
+            poJSON.put("value", getValue(lnColumn));
             return poJSON;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -478,5 +519,80 @@ public class Model_Client_Address implements GEntity{
         }
         
     }
+    public JSONObject SearchBarangay(String fsValue, boolean fbByCode){
+        String lsSQL = "SELECT " +
+                            "  a.sBrgyIDxx" +
+                            ", a.sBrgyName" +
+                            ", b.sTownName" + 
+                            ", b.sZippCode" +
+                            ", c.sProvName" + 
+                            ", c.sProvIDxx" +
+                            ", b.sTownIDxx" +
+                        " FROM Barangay a" + 
+                            ", TownCity b" +
+                            ", Province c" +
+                        " WHERE a.sTownIDxx = b.sTownIDxx" + 
+                            " AND b.sProvIDxx = c.sProvIDxx" + 
+                            " AND a.cRecdStat = '1'" + 
+                            " AND b.cRecdStat = '1'" + 
+                            " AND c.cRecdStat = '1'";
+        
+        if (fbByCode){
+            lsSQL = MiscUtil.addCondition(lsSQL, "a.sBrgyIDxx = " + SQLUtil.toSQL(fsValue));
+            
+            ResultSet loRS = poGRider.executeQuery(lsSQL);
+            
+            return ShowDialogFX.Browse(poGRider, 
+                                            loRS, 
+                                            "ID»Barangay»Town»Province", 
+                                            "sBrgyIDxx»sBrgyName»sTownName»sProvName");
+        }
+        
+        return ShowDialogFX.Search(poGRider, 
+                                        lsSQL, 
+                                        fsValue, 
+                                        "ID»Barangay»Town»Province", 
+                                        "sBrgyIDxx»sBrgyName»sTownName»sProvName", 
+                                        "a.sBrgyIDxx»a.sBrgyName»b.sTownName»c.sProvName", 
+                                        1);
+    }
+    
+    public JSONObject SearchTown(String fsValue, boolean fbByCode){
+        String lsSQL = "SELECT " +
+                            "  a.sTownIDxx" +
+                            ", a.sTownName" + 
+                            ", a.sZippCode" +
+                            ", b.sProvName" + 
+                            ", b.sProvIDxx" +
+                        " FROM TownCity a" +
+                            ", Province b" +
+                        " WHERE a.sProvIDxx = b.sProvIDxx" + 
+                            " AND a.cRecdStat = '1'";
+        
+        if (fbByCode){
+            lsSQL = MiscUtil.addCondition(lsSQL, "a.sTownIDxx = " + SQLUtil.toSQL(fsValue));
+            
+            ResultSet loRS = poGRider.executeQuery(lsSQL);
+            
+            return ShowDialogFX.Browse(poGRider, 
+                                            loRS, 
+                                            "ID»Town»Postal Code»Province", 
+                                            "sTownIDxx»sTownName»sZippCode»sProvName");
+        }
+        
+        return ShowDialogFX.Search(poGRider, 
+                                        lsSQL, 
+                                        fsValue, 
+                                        "ID»Town»Postal Code»Province", 
+                                        "sTownIDxx»sTownName»sZippCode»sProvName", 
+                                        "a.sTownIDxx»a.sTownName»a.sZippCode»b.sProvName", 
+                                        1);
+    }
+
+    @Override
+    public int getEditMode() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
     
 }
