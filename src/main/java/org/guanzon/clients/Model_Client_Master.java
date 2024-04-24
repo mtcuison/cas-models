@@ -35,13 +35,15 @@ public class Model_Client_Master implements GEntity{
     GRider poGRider;
     int pnEditMode;
     public JSONObject poJSON;
-    public Model_Client_Master(Connection foValue){
+    public Model_Client_Master(Connection foValue, GRider poValue){
         if (foValue == null){
             System.err.println("Database connection is not set.");
             System.exit(1);
         }
-        
+        pnEditMode = EditMode.UNKNOWN;
+        poGRider = poValue;
         poConn = foValue;
+        
         
         initialize();
     }
@@ -224,14 +226,14 @@ public class Model_Client_Master implements GEntity{
      * @return  True if the record assignment is successful.
      */
     public JSONObject setFullName(String fsValue){
-        return setValue("sClientNm", fsValue);
+        return setValue("sCompnyNm", fsValue);
     }
     
     /**
      * @return The complete name of the client.
      */
     public String getFullName(){
-        return (String) getValue("sClientNm");
+        return (String) getValue("sCompnyNm");
     }
     
     /**
@@ -636,6 +638,10 @@ public class Model_Client_Master implements GEntity{
     @Override
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
+        
+        //replace with the primary key column info
+        setClientID(MiscUtil.getNextCode(getTable(), "sClientID", true, poConn, poGRider.getBranchCode()));
+        
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -646,7 +652,7 @@ public class Model_Client_Master implements GEntity{
         poJSON = new JSONObject();
 
         String lsSQL = MiscUtil.makeSelect(this);
-        lsSQL = MiscUtil.addCondition(lsSQL, "sMobileID = " + SQLUtil.toSQL(fsValue));
+        lsSQL = MiscUtil.addCondition(lsSQL, "sClientID = " + SQLUtil.toSQL(fsValue));
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -673,45 +679,65 @@ public class Model_Client_Master implements GEntity{
     }
 
     @Override
-    public JSONObject saveRecord() {String lsSQL;
+    public JSONObject saveRecord() {
         
-        poJSON =  new JSONObject();
-        try {
-            lsSQL = MiscUtil.rowset2SQL(poEntity, 
-                    getTable(),
-                    "",
-                    "");
+        poJSON = new JSONObject();
         
-            if (pnEditMode == EditMode.ADDNEW){           
-                lsSQL = MiscUtil.getNextCode(getTable(), "sClientID", false, poGRider.getConnection(), "");
-                poEntity.updateObject("sClientID", lsSQL);
-                poEntity.updateRow();
-
-                lsSQL = MiscUtil.rowset2SQL(poEntity, getTable(), "");
-            } else {            
-                lsSQL = MiscUtil.rowset2SQL(poEntity, 
-                                            getTable(), 
-                                            "", 
-                                            "sClientID = " + SQLUtil.toSQL(poEntity.getString("sClientID")));
-            }
-            
-            if (!lsSQL.equals("")){
-                if(poGRider.executeQuery(lsSQL, getTable(), "", "") == 0){
-                    if(!poGRider.getErrMsg().isEmpty()){ 
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
+            String lsSQL;
+            if (pnEditMode == EditMode.ADDNEW){
+                //replace with the primary key column info
+                setClientID(MiscUtil.getNextCode(getTable(), "sClientID", true, poGRider.getConnection(), poGRider.getBranchCode()));
+                setModifiedDate(poGRider.getServerDate());
+                
+                lsSQL = MiscUtil.makeSQL(this, "xBirthPlc»xCitizenx»xSpouseNm");
+                
+                if (!lsSQL.isEmpty()){
+                    if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
+                        poJSON.put("result", "success");
+                        poJSON.put("message", "Record saved successfully.");
+                    } else {
                         poJSON.put("result", "error");
                         poJSON.put("message", poGRider.getErrMsg());
-                        return poJSON;
                     }
-                }else {
+                } else {
                     poJSON.put("result", "error");
-                    poJSON.put("message", "No record updated");
-                    return poJSON;
+                    poJSON.put("message", "No record to save.");
+                }
+            } else {
+                Model_Client_Master loOldEntity = new Model_Client_Master(poConn, poGRider);
+                
+                //replace with the primary key column info
+                JSONObject loJSON = loOldEntity.openRecord(this.getClientID());
+                
+                if ("success".equals((String) loJSON.get("result"))){
+                    //replace the condition based on the primary key column of the record
+                    setModifiedDate(poGRider.getServerDate());
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sClientID = " + SQLUtil.toSQL(this.getClientID()), "xBirthPlc»xCitizenx»xSpouseNm");
+                    
+                    if (!lsSQL.isEmpty()){
+                        if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
+                            poJSON.put("result", "success");
+                            poJSON.put("message", "Record saved successfully.");
+                        } else {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", poGRider.getErrMsg());
+                        }
+                    } else {
+                        poJSON.put("result", "success");
+                        poJSON.put("message", "No updates has been made.");
+                    }
+                } else {
+                    poJSON.put("result", "error");
+                    poJSON.put("message", "Record discrepancy. Unable to save record.");
                 }
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(Model_Client_Mobile.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            poJSON.put("result", "error");
+            poJSON.put("message", "Invalid update mode. Unable to save record.");
+            return poJSON;
         }
+        
         return poJSON;
     }
     @Override
@@ -721,7 +747,8 @@ public class Model_Client_Master implements GEntity{
         try {
             poEntity.updateObject(lnColumn, foValue);
             poEntity.updateRow();
-            poJSON.put("result", getValue(lnColumn));
+            poJSON.put("result", "success");
+            poJSON.put("value", getValue(lnColumn));
             return poJSON;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -745,6 +772,11 @@ public class Model_Client_Master implements GEntity{
             
         }
         
+    }
+
+    @Override
+    public int getEditMode() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

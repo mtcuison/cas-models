@@ -31,6 +31,7 @@ public class Model_Client_Mobile implements GEntity{
     String psMessage;           //warning, success or error message
     GRider poGRider;
     int pnEditMode;
+    
     public JSONObject poJSON;
     public Model_Client_Mobile(Connection foValue, GRider poValue){
         if (foValue == null){
@@ -358,12 +359,15 @@ public class Model_Client_Mobile implements GEntity{
         
         try {
             poEntity = MiscUtil.xml2ResultSet(System.getProperty("sys.default.path.metadata") + XML, getTable());
-            
-            
             poEntity.last();
             poEntity.moveToInsertRow();
 
             MiscUtil.initRowSet(poEntity);
+            
+            //replace with the primary key column info
+//            setClientID(MiscUtil.getNextCode(getTable(), "sMobileID", true, poConn, poGRider.getBranchCode()));
+//            System.out.println("sMobileID = " + getMobileID());
+            poEntity.updateString("sMobileID", MiscUtil.getNextCode(getTable(), "sMobileID", true, poConn, poGRider.getBranchCode()));
             poEntity.updateString("cMobileTp", Logical.NO);
             poEntity.updateString("cOwnerxxx", Logical.NO);
             poEntity.updateString("cRecdStat", Logical.YES);
@@ -382,6 +386,8 @@ public class Model_Client_Mobile implements GEntity{
     @Override
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
+        
+        
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -420,45 +426,102 @@ public class Model_Client_Mobile implements GEntity{
 
     @Override
     public JSONObject saveRecord() {
-        String lsSQL;
+        poJSON = new JSONObject();
         
-        poJSON =  new JSONObject();
-        try {
-            lsSQL = MiscUtil.rowset2SQL(poEntity, 
-                    getTable(),
-                    "",
-                    "");
-        
-            if (pnEditMode == EditMode.ADDNEW){           
-                lsSQL = MiscUtil.getNextCode(getTable(), "sMobileID", false, poGRider.getConnection(), "");
-                poEntity.updateObject("sMobileID", lsSQL);
-                poEntity.updateRow();
-
-                lsSQL = MiscUtil.rowset2SQL(poEntity, getTable(), "");
-            } else {            
-                lsSQL = MiscUtil.rowset2SQL(poEntity, 
-                                            getTable(), 
-                                            "", 
-                                            "sMobileID = " + SQLUtil.toSQL(poEntity.getString("sMobileID")));
-            }
-            
-            if (!lsSQL.equals("")){
-                if(poGRider.executeQuery(lsSQL, getTable(), "", "") == 0){
-                    if(!poGRider.getErrMsg().isEmpty()){ 
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
+            String lsSQL;
+            if (pnEditMode == EditMode.ADDNEW){
+                //replace with the primary key column info
+                setMobileID(MiscUtil.getNextCode(getTable(), "sMobileID", true, poGRider.getConnection(), poGRider.getBranchCode()));
+                setModifiedDate(poGRider.getServerDate());
+                setMobileNetwork(CommonUtils.classifyNetwork(getContactNo()));
+                lsSQL = MiscUtil.makeSQL(this);
+                
+                if (!lsSQL.isEmpty()){
+                    if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
+                        poJSON.put("result", "success");
+                        poJSON.put("message", "Record saved successfully.");
+                    } else {
                         poJSON.put("result", "error");
                         poJSON.put("message", poGRider.getErrMsg());
-                        return poJSON;
                     }
-                }else {
+                } else {
                     poJSON.put("result", "error");
-                    poJSON.put("message", "No record updated");
-                    return poJSON;
+                    poJSON.put("message", "No record to save.");
+                }
+            } else {
+                Model_Client_Mobile loOldEntity = new Model_Client_Mobile(poConn, poGRider);
+                
+                //replace with the primary key column info
+                JSONObject loJSON = loOldEntity.openRecord(this.getMobileID());
+                setModifiedDate(poGRider.getServerDate());
+                setMobileNetwork(CommonUtils.classifyNetwork(getContactNo()));
+                if ("success".equals((String) loJSON.get("result"))){
+                    //replace the condition based on the primary key column of the record
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sMobileID = " + SQLUtil.toSQL(this.getClientID()));
+                    
+                    if (!lsSQL.isEmpty()){
+                        if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
+                            poJSON.put("result", "success");
+                            poJSON.put("message", "Record saved successfully.");
+                        } else {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", poGRider.getErrMsg());
+                        }
+                    } else {
+                        poJSON.put("result", "success");
+                        poJSON.put("message", "No updates has been made.");
+                    }
+                } else {
+                    poJSON.put("result", "error");
+                    poJSON.put("message", "Record discrepancy. Unable to save record.");
                 }
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(Model_Client_Mobile.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            poJSON.put("result", "error");
+            poJSON.put("message", "Invalid update mode. Unable to save record.");
+            return poJSON;
         }
+//        
+//        String lsSQL;
+//        
+//        poJSON =  new JSONObject();
+//        try {
+//            lsSQL = MiscUtil.rowset2SQL(poEntity, 
+//                    getTable(),
+//                    "",
+//                    "");
+//        
+//            if (pnEditMode == EditMode.ADDNEW){           
+//                lsSQL = MiscUtil.getNextCode(getTable(), "sMobileID", false, poGRider.getConnection(), "");
+//                poEntity.updateObject("sMobileID", lsSQL);
+//                poEntity.updateRow();
+//
+//                lsSQL = MiscUtil.rowset2SQL(poEntity, getTable(), "");
+//            } else {            
+//                lsSQL = MiscUtil.rowset2SQL(poEntity, 
+//                                            getTable(), 
+//                                            "", 
+//                                            "sMobileID = " + SQLUtil.toSQL(poEntity.getString("sMobileID")));
+//            }
+//            
+//            if (!lsSQL.equals("")){
+//                if(poGRider.executeQuery(lsSQL, getTable(), "", "") == 0){
+//                    if(!poGRider.getErrMsg().isEmpty()){ 
+//                        poJSON.put("result", "error");
+//                        poJSON.put("message", poGRider.getErrMsg());
+//                        return poJSON;
+//                    }
+//                }else {
+//                    poJSON.put("result", "error");
+//                    poJSON.put("message", "No record updated");
+//                    return poJSON;
+//                }
+//            }
+//
+//        } catch (SQLException ex) {
+//            Logger.getLogger(Model_Client_Mobile.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         return poJSON;
 
     }
@@ -470,7 +533,8 @@ public class Model_Client_Mobile implements GEntity{
         try {
             poEntity.updateObject(lnColumn, foValue);
             poEntity.updateRow();
-            poJSON.put("result", getValue(lnColumn));
+            poJSON.put("result", "success");
+            poJSON.put("value", getValue(lnColumn));
             return poJSON;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -494,6 +558,11 @@ public class Model_Client_Mobile implements GEntity{
             
         }
         
+    }
+
+    @Override
+    public int getEditMode() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
     
