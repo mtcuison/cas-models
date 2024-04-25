@@ -13,6 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
+import org.guanzon.appdriver.agent.ShowDialogFX;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -327,7 +329,12 @@ public class Model_Client_Master implements GEntity{
      * @return The date of birth of the client.
      */
     public Date getBirthDate(){
-        return (Date) getValue("dBirthDte");
+        System.out.println("dBirthDte" + getValue("dBirthDte"));
+        Date date = null;
+        if(!getValue("dBirthDte").toString().isEmpty()){
+            date = CommonUtils.toDate(getValue("dBirthDte").toString());
+        }
+        return date;
     }
     
     /**
@@ -572,35 +579,43 @@ public class Model_Client_Master implements GEntity{
         return psMessage;
     }
     
+    
     private String getSQL(){
         return "SELECT" +
-                    "  sClientID" +
-                    ", cClientTp" +
-                    ", sLastName" +
-                    ", sFrstName" +
-                    ", sMiddName" +
-                    ", sSuffixNm" +
-                    ", sClientNm" +
-                    ", cGenderCd" +
-                    ", cCvilStat" +
-                    ", sCitizenx" +
-                    ", dBirthDte" +
-                    ", sBirthPlc" +
-                    ", sAddlInfo" +
-                    ", sSpouseID" +
-                    ", sTaxIDNox" +
-                    ", cLRClient" +
-                    ", cMCClient" +
-                    ", cSCClient" +
-                    ", cSPClient" +
-                    ", cCPClient" +
-                    ", cRecdStat" +
-                    ", sModified" +
-                    ", dModified" +
-                    ", '' xBirthPlc" +
-                    ", '' xCitizenx" +
-                    ", '' xSpouseNm" +
-                " FROM " + getTable();
+                "  a.sClientID" +
+                ", a.cClientTp" +
+                ", a.sLastName" +
+                ", a.sFrstName" +
+                ", a.sMiddName" +
+                ", a.sSuffixNm" +
+                ", a.sMaidenNm" +
+                ", a.sCompnyNm" +
+                ", a.cGenderCd" +
+                ", a.cCvilStat" +
+                ", a.sCitizenx" +
+                ", a.dBirthDte" +
+                ", a.sBirthPlc" +
+                ", a.sAddlInfo" +
+                ", a.sSpouseID" +
+                ", a.sTaxIDNox" +
+                ", a.sLTOIDxxx" +
+                ", a.sPHBNIDxx" +
+                ", a.cLRClient" +
+                ", a.cMCClient" +
+                ", a.cSCClient" +
+                ", a.cSPClient" +
+                ", a.cCPClient" +
+                ", a.cRecdStat" +
+                ", a.sModified" +
+                ", a.dModified" +
+                ", b.sTownName xBirthPlc" +
+                ", c.sCntryNme xCitizenx" +
+                ", d.sCompnyNm xSpouseNm" +
+                " FROM " + getTable() + " a" +
+                            " LEFT JOIN TownCity b ON a.sBirthPlc = b.sTownIDxx" +
+                            " LEFT JOIN Country c ON a.sCitizenx = c.sCntryCde" +
+                            " LEFT JOIN Client_Master d ON a.sSpouseID = d.sClientID" +
+                        " WHERE a.cRecdStat = '1'";
     }
     
     private void initialize(){
@@ -651,15 +666,16 @@ public class Model_Client_Master implements GEntity{
     public JSONObject openRecord(String fsValue) { pnEditMode = EditMode.UPDATE;
         poJSON = new JSONObject();
 
-        String lsSQL = MiscUtil.makeSelect(this);
-        lsSQL = MiscUtil.addCondition(lsSQL, "sClientID = " + SQLUtil.toSQL(fsValue));
-
+        String lsSQL = getSQL();
+        lsSQL = MiscUtil.addCondition(getSQL(), "a.sClientID = " + SQLUtil.toSQL(fsValue));
+        System.out.println(lsSQL);
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
         try {
             if (loRS.next()){
                 for (int lnCtr = 1; lnCtr <= loRS.getMetaData().getColumnCount(); lnCtr++){
                     setValue(lnCtr, loRS.getObject(lnCtr));
+                    System.out.println(loRS.getMetaData().getColumnName(lnCtr) + " = " + loRS.getString(lnCtr));
                 }
 
                 pnEditMode = EditMode.UPDATE;
@@ -713,6 +729,7 @@ public class Model_Client_Master implements GEntity{
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record
                     setModifiedDate(poGRider.getServerDate());
+                    
                     lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sClientID = " + SQLUtil.toSQL(this.getClientID()), "xBirthPlc»xCitizenx»xSpouseNm");
                     
                     if (!lsSQL.isEmpty()){
@@ -778,5 +795,6 @@ public class Model_Client_Master implements GEntity{
     public int getEditMode() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
 
 }

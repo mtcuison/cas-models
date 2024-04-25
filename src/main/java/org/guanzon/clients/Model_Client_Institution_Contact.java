@@ -448,7 +448,7 @@ public class Model_Client_Institution_Contact implements GEntity{
             
             list();
             poEntity.updateString("sContctID", MiscUtil.getNextCode(getTable(), "sContctID", true, poConn, poGRider.getBranchCode()));
-            poEntity.updateString("cPrimaryx", Logical.NO);
+//            poEntity.updateString("cPrimaryx", Logical.NO);
 //            setPrimary(false);
             poEntity.updateString("cRecdStat", Logical.YES);
             poEntity.insertRow();

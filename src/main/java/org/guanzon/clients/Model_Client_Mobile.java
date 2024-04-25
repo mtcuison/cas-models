@@ -368,9 +368,18 @@ public class Model_Client_Mobile implements GEntity{
 //            setClientID(MiscUtil.getNextCode(getTable(), "sMobileID", true, poConn, poGRider.getBranchCode()));
 //            System.out.println("sMobileID = " + getMobileID());
             poEntity.updateString("sMobileID", MiscUtil.getNextCode(getTable(), "sMobileID", true, poConn, poGRider.getBranchCode()));
+            poEntity.updateString("nUnreachx", Logical.NO);
+            poEntity.updateString("nNoRetryx", Logical.NO);
             poEntity.updateString("cMobileTp", Logical.NO);
             poEntity.updateString("cOwnerxxx", Logical.NO);
             poEntity.updateString("cRecdStat", Logical.YES);
+            poEntity.updateString("dLastVeri", null);
+            poEntity.updateString("dInactive", null);
+            poEntity.updateString("dConfirmd", null);
+            poEntity.updateString("dHoldMktg", null);
+            poEntity.updateString("dMktgMsg1", null);
+            poEntity.updateString("dMktgMsg2", null);
+            poEntity.updateString("dMktgMsg3", null);
             
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -434,6 +443,7 @@ public class Model_Client_Mobile implements GEntity{
                 //replace with the primary key column info
                 setMobileID(MiscUtil.getNextCode(getTable(), "sMobileID", true, poGRider.getConnection(), poGRider.getBranchCode()));
                 setModifiedDate(poGRider.getServerDate());
+                
                 setMobileNetwork(CommonUtils.classifyNetwork(getContactNo()));
                 lsSQL = MiscUtil.makeSQL(this);
                 
