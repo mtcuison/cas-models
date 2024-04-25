@@ -1,4 +1,4 @@
-package org.guanzon.clients;
+package org.guanzon.cas.model.clients;
 
 import com.google.gson.annotations.SerializedName;
 import java.lang.annotation.Annotation;

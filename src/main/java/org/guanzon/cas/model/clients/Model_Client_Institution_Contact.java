@@ -1,4 +1,4 @@
-package org.guanzon.clients;
+package org.guanzon.cas.model.clients;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -79,35 +79,35 @@ public class Model_Client_Institution_Contact implements GEntity{
 
     @Override
     public void list() { 
-        Method[] methods = this.getClass().getMethods();
-        
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println("LIST OF PUBLIC METHODS FOR " + this.getClass().getName() + ":");
-        System.out.println("--------------------------------------------------------------------");
-        for (Method method : methods) {
-            System.out.println(method.getName());
-        }
-        
-        try {
-            int lnRow = poEntity.getMetaData().getColumnCount();
-        
-            System.out.println("--------------------------------------------------------------------");
-            System.out.println("ENTITY COLUMN INFO");
-            System.out.println("--------------------------------------------------------------------");
-            System.out.println("Total number of columns: " + lnRow);
-            System.out.println("--------------------------------------------------------------------");
-
-            for (int lnCtr = 1; lnCtr <= lnRow; lnCtr++){
-                System.out.println("Column index: " + (lnCtr) + " --> Label: " + poEntity.getMetaData().getColumnLabel(lnCtr));
-                if (poEntity.getMetaData().getColumnType(lnCtr) == Types.CHAR ||
-                    poEntity.getMetaData().getColumnType(lnCtr) == Types.VARCHAR){
-
-                    System.out.println("Column index: " + (lnCtr) + " --> Size: " + poEntity.getMetaData().getColumnDisplaySize(lnCtr));
-                }
-            }
-        } catch (SQLException e) {
-        }
-        
+//        Method[] methods = this.getClass().getMethods();
+//        
+//        System.out.println("--------------------------------------------------------------------");
+//        System.out.println("LIST OF PUBLIC METHODS FOR " + this.getClass().getName() + ":");
+//        System.out.println("--------------------------------------------------------------------");
+//        for (Method method : methods) {
+//            System.out.println(method.getName());
+//        }
+//        
+//        try {
+//            int lnRow = poEntity.getMetaData().getColumnCount();
+//        
+//            System.out.println("--------------------------------------------------------------------");
+//            System.out.println("ENTITY COLUMN INFO");
+//            System.out.println("--------------------------------------------------------------------");
+//            System.out.println("Total number of columns: " + lnRow);
+//            System.out.println("--------------------------------------------------------------------");
+//
+//            for (int lnCtr = 1; lnCtr <= lnRow; lnCtr++){
+//                System.out.println("Column index: " + (lnCtr) + " --> Label: " + poEntity.getMetaData().getColumnLabel(lnCtr));
+//                if (poEntity.getMetaData().getColumnType(lnCtr) == Types.CHAR ||
+//                    poEntity.getMetaData().getColumnType(lnCtr) == Types.VARCHAR){
+//
+//                    System.out.println("Column index: " + (lnCtr) + " --> Size: " + poEntity.getMetaData().getColumnDisplaySize(lnCtr));
+//                }
+//            }
+//        } catch (SQLException e) {
+//        }
+//        
     }
 
     @Override

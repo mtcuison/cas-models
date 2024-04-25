@@ -1,17 +1,13 @@
-package org.guanzon.clients;
+package org.guanzon.cas.model.clients;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.RowSetProvider;
-import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -19,21 +15,21 @@ import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
+
 /**
  *
  * @author Michael Cuison
  */
-public class Model_Client_Mobile implements GEntity{
+public class Model_Client_Social_Media implements GEntity{
     
-    final String XML = "Model_Client_Mobile.xml";
+    final String XML = "Model_Client_Social_Media.xml";
     Connection poConn;          //connection
     CachedRowSet poEntity;      //rowset
     String psMessage;           //warning, success or error message
     GRider poGRider;
     int pnEditMode;
-    
     public JSONObject poJSON;
-    public Model_Client_Mobile(Connection foValue, GRider poValue){
+    public Model_Client_Social_Media(Connection foValue, GRider poValue){
         if (foValue == null){
             System.err.println("Database connection is not set.");
             System.exit(1);
@@ -76,7 +72,7 @@ public class Model_Client_Mobile implements GEntity{
 
     @Override
     public String getTable() {
-        return "Client_Mobile";
+        return "Client_Social_Media";
     }
 
     @Override
@@ -114,15 +110,15 @@ public class Model_Client_Mobile implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setMobileID(String fsValue){
-        return setValue("sMobileID", fsValue);
+    public JSONObject setSocialID(String fsValue){
+        return setValue("sSocialID", fsValue);
     }
     
     /** 
      * @return The ID of this record. 
      */
-    public String getMobileID(){
-        return (String) getValue("sMobileID");
+    public String getSocialID(){
+        return (String) getValue("sSocialID");
     }
     
     /**
@@ -143,133 +139,57 @@ public class Model_Client_Mobile implements GEntity{
     }
     
     /**
-     * Sets the contact number.
+     * Sets the social account.
      * 
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setContactNo(String fsValue){
-        return setValue("sMobileNo", fsValue);
+    public JSONObject setSocialAccount(String fsValue){
+        return setValue("sAccountx", fsValue);
     }
     
     /**
-     * @return The contact number.
+     * @return The social account.
      */
-    public String getContactNo(){
-        return (String) getValue("sMobileNo");
+    public String getSocialAccount(){
+        return (String) getValue("sAccountx");
     }
     
     /**
-     * Sets the type of the contact number.<br>
-     * 0 for Mobile No.<br>
-     * 1 for Telephone No.<br>
-     * 2 for Fax Machine No.
+     * Sets the remarks.<br>
      * 
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setContactType(String fsValue){
-        return setValue("cMobileTp", fsValue);
+    public JSONObject setRemarks(String fsValue){
+        return setValue("sRemarksx", fsValue);
     }
     
     /**
-     * @return The type of  the contact number. 
+     * @return The remarks. 
      */
-    public String getContactType(){
-        return (String) getValue("cMobileTp");
+    public String getRemarks(){
+        return (String) getValue("sRemarksx");
     }
     
     /**
-     * Sets the ownership of the contact number.<br>
-     * 0 for Personal<br>
-     * 1 for Company Issued<br>
-     * 2 for Others
+     * Sets the social account type.<br>
+     * 0 for Facebook<br>
+     * 1 for Instagram<br>
+     * 2 for Twitter
      * 
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setOwnership(String fsValue){
-        return setValue("cOwnerxxx", fsValue);
+    public JSONObject setSocialTyp(String fsValue){
+        return setValue("cSocialTp", fsValue);
     }
     
     /**
-     * @return The ownership of the contact number. 
+     * @return The social account type. 
      */
-    public String getOwnership(){
-        return (String) getValue("cOwnerxxx");
-    }
-    
-    /**
-     * Sets the contact number as Primary
-     * 
-     * @param fbValue 
-     * @return  True if the record assignment is successful.
-     */
-    public JSONObject setPrimary(boolean fbValue){
-        return setValue("cPrimaryx", fbValue ? "1" : "0");
-    }
-    
-    /**
-     * @return If the contact number set as Primary
-     */
-    public boolean isPrimary(){
-        return ((String) getValue("cPrimaryx")).equals("1");
-    }
-    
-    /**
-     * Sets the priority number of the contact number.
-     * 
-     * @param fnValue 
-     * @return  True if the record assignment is successful.
-     */
-    public JSONObject setPriority(int fnValue){
-        return setValue("nPriority", fnValue);
-    }
-    
-    /**
-     * 
-     * @return The priority number of the contact number. 
-     */
-    public int getPriority(){
-        return (int) getValue("nPriority");
-    }
-    
-    /**
-     * Sets if the contact number will be receiving marketing message.
-     * 
-     * @param fbValue 
-     * @return  True if the record assignment is successful.
-     */
-    public JSONObject setMarketingRecipient(boolean fbValue){
-        return setValue("cIncdMktg", fbValue ? "1" : "0");
-    }
-    
-    /**
-     * @return If the contact number is receiving marketing message. 
-     */
-    public boolean isMarketingRecipient(){
-        return ((String) getValue("cIncdMktg")).equals("1");
-    }
-    
-    /**
-     * Sets the network if the contact number. Use this method for records as Mobile numbers only.<br>
-     * 0 for Globe Telecom<br>
-     * 1 for Smart Communications<br>
-     * 2 for Sun Cellular<br>
-     * 3 for DITO Telecom
-     * 
-     * @param fsValue 
-     * @return  True if the record assignment is successful.
-     */
-    public JSONObject setMobileNetwork(String fsValue){
-        return setValue("cSubscrbr", fsValue);
-    }
-    
-    /**
-     * @return The network of the contact number. Use this method for records as Mobile numbers only. 
-     */
-    public String getMobileNetwork(){
-        return (String) getValue("cSubscrbr");
+    public String getSocialTyp(){
+        return (String) getValue("cSocialTp");
     }
     
     /**
@@ -329,28 +249,13 @@ public class Model_Client_Mobile implements GEntity{
     
     private String getSQL(){
         return "SELECT" +
-                    "  sMobileID" +
+                    "  sSocialID" +
                     ", sClientID" +
-                    ", sMobileNo" +
-                    ", cMobileTp" +
-                    ", cOwnerxxx" +
-                    ", cPrimaryx" +
-                    ", nPriority" +
-                    ", cIncdMktg" +
-                    ", nUnreachx" +
-                    ", dLastVeri" +
-                    ", dInactive" +
-                    ", nNoRetryx" +
-                    ", cInvalidx" +
-                    ", cConfirmd" +
-                    ", dConfirmd" +
-                    ", cSubscrbr" +
-                    ", dHoldMktg" +
-                    ", dMktgMsg1" +
-                    ", dMktgMsg2" +
-                    ", dMktgMsg3" +
-                    ", cNewMobil" +
+                    ", sAccountx" +
+                    ", sRemarksx" +
+                    ", cSocialTp" +
                     ", cRecdStat" +
+                    ", sModified" +
                     ", dModified" +
                 " FROM " + getTable();
     }
@@ -359,27 +264,16 @@ public class Model_Client_Mobile implements GEntity{
         
         try {
             poEntity = MiscUtil.xml2ResultSet(System.getProperty("sys.default.path.metadata") + XML, getTable());
+            
+            
             poEntity.last();
             poEntity.moveToInsertRow();
 
             MiscUtil.initRowSet(poEntity);
-            
-            //replace with the primary key column info
-//            setClientID(MiscUtil.getNextCode(getTable(), "sMobileID", true, poConn, poGRider.getBranchCode()));
-//            System.out.println("sMobileID = " + getMobileID());
-            poEntity.updateString("sMobileID", MiscUtil.getNextCode(getTable(), "sMobileID", true, poConn, poGRider.getBranchCode()));
-            poEntity.updateString("nUnreachx", Logical.NO);
-            poEntity.updateString("nNoRetryx", Logical.NO);
-            poEntity.updateString("cMobileTp", Logical.NO);
-            poEntity.updateString("cOwnerxxx", Logical.NO);
+         //replace with the primary key column info
+            poEntity.updateString("sSocialID", MiscUtil.getNextCode(getTable(), "sSocialID", true, poConn, poGRider.getBranchCode()));
+            poEntity.updateString("cSocialTp", Logical.NO);
             poEntity.updateString("cRecdStat", Logical.YES);
-            poEntity.updateString("dLastVeri", null);
-            poEntity.updateString("dInactive", null);
-            poEntity.updateString("dConfirmd", null);
-            poEntity.updateString("dHoldMktg", null);
-            poEntity.updateString("dMktgMsg1", null);
-            poEntity.updateString("dMktgMsg2", null);
-            poEntity.updateString("dMktgMsg3", null);
             
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -396,6 +290,8 @@ public class Model_Client_Mobile implements GEntity{
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
         
+        //replace with the primary key column info
+        setSocialID(MiscUtil.getNextCode(getTable(), "sSocialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
         
         poJSON = new JSONObject();
         poJSON.put("result", "success");
@@ -407,7 +303,7 @@ public class Model_Client_Mobile implements GEntity{
         poJSON = new JSONObject();
 
         String lsSQL = MiscUtil.makeSelect(this);
-        lsSQL = MiscUtil.addCondition(lsSQL, "sMobileID = " + SQLUtil.toSQL(fsValue));
+        lsSQL = MiscUtil.addCondition(lsSQL, "sSocialID = " + SQLUtil.toSQL(fsValue));
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -441,10 +337,8 @@ public class Model_Client_Mobile implements GEntity{
             String lsSQL;
             if (pnEditMode == EditMode.ADDNEW){
                 //replace with the primary key column info
-                setMobileID(MiscUtil.getNextCode(getTable(), "sMobileID", true, poGRider.getConnection(), poGRider.getBranchCode()));
+                setSocialID(MiscUtil.getNextCode(getTable(), "sSocialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
                 setModifiedDate(poGRider.getServerDate());
-                
-                setMobileNetwork(CommonUtils.classifyNetwork(getContactNo()));
                 lsSQL = MiscUtil.makeSQL(this);
                 
                 if (!lsSQL.isEmpty()){
@@ -460,15 +354,15 @@ public class Model_Client_Mobile implements GEntity{
                     poJSON.put("message", "No record to save.");
                 }
             } else {
-                Model_Client_Mobile loOldEntity = new Model_Client_Mobile(poConn, poGRider);
+                Model_Client_Social_Media loOldEntity = new Model_Client_Social_Media(poConn, poGRider);
                 
                 //replace with the primary key column info
-                JSONObject loJSON = loOldEntity.openRecord(this.getMobileID());
+                JSONObject loJSON = loOldEntity.openRecord(this.getSocialID());
                 setModifiedDate(poGRider.getServerDate());
-                setMobileNetwork(CommonUtils.classifyNetwork(getContactNo()));
+                
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sMobileID = " + SQLUtil.toSQL(this.getClientID()));
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSocialID = " + SQLUtil.toSQL(this.getClientID()));
                     
                     if (!lsSQL.isEmpty()){
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
@@ -492,46 +386,6 @@ public class Model_Client_Mobile implements GEntity{
             poJSON.put("message", "Invalid update mode. Unable to save record.");
             return poJSON;
         }
-//        
-//        String lsSQL;
-//        
-//        poJSON =  new JSONObject();
-//        try {
-//            lsSQL = MiscUtil.rowset2SQL(poEntity, 
-//                    getTable(),
-//                    "",
-//                    "");
-//        
-//            if (pnEditMode == EditMode.ADDNEW){           
-//                lsSQL = MiscUtil.getNextCode(getTable(), "sMobileID", false, poGRider.getConnection(), "");
-//                poEntity.updateObject("sMobileID", lsSQL);
-//                poEntity.updateRow();
-//
-//                lsSQL = MiscUtil.rowset2SQL(poEntity, getTable(), "");
-//            } else {            
-//                lsSQL = MiscUtil.rowset2SQL(poEntity, 
-//                                            getTable(), 
-//                                            "", 
-//                                            "sMobileID = " + SQLUtil.toSQL(poEntity.getString("sMobileID")));
-//            }
-//            
-//            if (!lsSQL.equals("")){
-//                if(poGRider.executeQuery(lsSQL, getTable(), "", "") == 0){
-//                    if(!poGRider.getErrMsg().isEmpty()){ 
-//                        poJSON.put("result", "error");
-//                        poJSON.put("message", poGRider.getErrMsg());
-//                        return poJSON;
-//                    }
-//                }else {
-//                    poJSON.put("result", "error");
-//                    poJSON.put("message", "No record updated");
-//                    return poJSON;
-//                }
-//            }
-//
-//        } catch (SQLException ex) {
-//            Logger.getLogger(Model_Client_Mobile.class.getName()).log(Level.SEVERE, null, ex);
-//        }
         return poJSON;
 
     }

@@ -1,10 +1,11 @@
-package org.guanzon.clients;
+package org.guanzon.cas.model.clients;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,10 +81,33 @@ public class Model_Client_Address implements GEntity{
     public void list() { 
         Method[] methods = this.getClass().getMethods();
         
-        System.out.println("List of public methods for class " + this.getClass().getName() + ":");
+        System.out.println("--------------------------------------------------------------------");
+        System.out.println("LIST OF PUBLIC METHODS FOR " + this.getClass().getName() + ":");
+        System.out.println("--------------------------------------------------------------------");
         for (Method method : methods) {
             System.out.println(method.getName());
         }
+        
+        try {
+            int lnRow = poEntity.getMetaData().getColumnCount();
+        
+            System.out.println("--------------------------------------------------------------------");
+            System.out.println("ENTITY COLUMN INFO");
+            System.out.println("--------------------------------------------------------------------");
+            System.out.println("Total number of columns: " + lnRow);
+            System.out.println("--------------------------------------------------------------------");
+
+            for (int lnCtr = 1; lnCtr <= lnRow; lnCtr++){
+                System.out.println("Column index: " + (lnCtr) + " --> Label: " + poEntity.getMetaData().getColumnLabel(lnCtr));
+                if (poEntity.getMetaData().getColumnType(lnCtr) == Types.CHAR ||
+                    poEntity.getMetaData().getColumnType(lnCtr) == Types.VARCHAR){
+
+                    System.out.println("Column index: " + (lnCtr) + " --> Size: " + poEntity.getMetaData().getColumnDisplaySize(lnCtr));
+                }
+            }
+        } catch (SQLException e) {
+        }
+        
     }
 
     /** 
@@ -207,11 +231,51 @@ public class Model_Client_Address implements GEntity{
         return setValue("sTownIDxx", fsValue);
     }
     
+    
     /**
      * @return The town id.
      */
     public String getTownID(){
         return (String) getValue("sTownIDxx");
+    }
+    
+    /**
+     * @return The town name.
+     */
+    public String getTownName(){
+        return (String) getValue("xTownName");
+    }
+    /**
+     * Sets the town name.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public JSONObject setTownName(String fsValue){
+        return setValue("xTownName", fsValue);
+    }
+    /**
+     * Sets the province id.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    
+    
+    /**
+     * @return The province name.
+     */
+    public String getProvinceName(){
+        return (String) getValue("xProvName");
+    }
+    /**
+     * Sets the province name.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public JSONObject setProvinceName(String fsValue){
+        return setValue("xProvName", fsValue);
     }
     /**
      * Sets the barangay id.
@@ -228,6 +292,23 @@ public class Model_Client_Address implements GEntity{
      */
     public String getBarangayID(){
         return (String) getValue("sBrgyIDxx");
+    }
+    
+    /**
+     * Sets the barangay name.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public JSONObject setBarangayName(String fsValue){
+        return setValue("xBrgyName", fsValue);
+    }
+    
+    /**
+     * @return The barangay name.
+     */
+    public String getBarangayName(){
+        return (String) getValue("xBrgyName");
     }
     
     /**
@@ -369,7 +450,7 @@ public class Model_Client_Address implements GEntity{
     private void initialize(){
         
         try {
-            
+            System.out.println("path = " + System.getProperty("sys.default.path.metadata") + XML);
             poEntity = MiscUtil.xml2ResultSet(System.getProperty("sys.default.path.metadata") + XML, getTable());
             
             poEntity.last();
@@ -502,26 +583,27 @@ public class Model_Client_Address implements GEntity{
         return poJSON;
 
     }
-
+    
     @Override
-    public JSONObject setValue(int lnColumn, Object foValue) {
-        
-            poJSON = new JSONObject();
-        try {
-            poEntity.updateObject(lnColumn, foValue);
+    public JSONObject setValue(int fnColumn, Object foValue) {
+        try {              
+            poJSON = MiscUtil.validateColumnValue(System.getProperty("sys.default.path.metadata") + XML, MiscUtil.getColumnLabel(poEntity, fnColumn), foValue);
+            if ("error".equals((String) poJSON.get("result"))) return poJSON;
+            
+            poEntity.updateObject(fnColumn, foValue);
             poEntity.updateRow();
+            
+            poJSON = new JSONObject();
             poJSON.put("result", "success");
-            poJSON.put("value", getValue(lnColumn));
-            return poJSON;
+            poJSON.put("value", getValue(fnColumn));
         } catch (SQLException e) {
             e.printStackTrace();
-            psMessage = e.getMessage();
             poJSON.put("result", "error");
             poJSON.put("message", e.getMessage());
-            return poJSON;
         }
+        
+        return poJSON;
     }
-
     @Override
     public JSONObject setValue(String string, Object foValue) {
         try {
@@ -575,6 +657,9 @@ public class Model_Client_Address implements GEntity{
             
             if (loJSON != null) {
                 setBarangayID((String) loJSON.get("sBrgyIDxx"));
+//                setBarangayName((String) loJSON.get("sBrgyName"));
+                setValue(13, (String) loJSON.get("sBrgyName"));
+                
                 loJSON.put("result", "success");
                 loJSON.put("message", "Search barangay success.");
                 return loJSON;
@@ -615,8 +700,14 @@ public class Model_Client_Address implements GEntity{
             
             if (loJSON != null) {
                 setTownID((String) loJSON.get("sTownIDxx"));
+                setTownName((String) loJSON.get("sTownName") + ", " + (String) loJSON.get("sProvName"));
+                
+//                setValue(12, (String) loJSON.get("sTownName"));
+//                setValue(14, (String) loJSON.get("sProvName"));
+                setProvinceName((String) loJSON.get("sProvName"));
                 loJSON.put("result", "success");
                 loJSON.put("message", "Search town success.");
+//                loJSON.put("message", "Search town success.");
                 return loJSON;
             }else {
                 loJSON.put("result", "success");
