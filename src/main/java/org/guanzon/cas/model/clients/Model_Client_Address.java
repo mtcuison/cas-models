@@ -596,6 +596,8 @@ public class Model_Client_Address implements GEntity{
             poJSON = new JSONObject();
             poJSON.put("result", "success");
             poJSON.put("value", getValue(fnColumn));
+            System.out.println("poJSON = " + poJSON);
+            
         } catch (SQLException e) {
             e.printStackTrace();
             poJSON.put("result", "error");
@@ -657,8 +659,8 @@ public class Model_Client_Address implements GEntity{
             
             if (loJSON != null) {
                 setBarangayID((String) loJSON.get("sBrgyIDxx"));
-//                setBarangayName((String) loJSON.get("sBrgyName"));
-                setValue(13, (String) loJSON.get("sBrgyName"));
+                setBarangayName((String) loJSON.get("sBrgyName"));
+//                setValue(13, (String) loJSON.get("sBrgyName"));
                 
                 loJSON.put("result", "success");
                 loJSON.put("message", "Search barangay success.");
@@ -700,7 +702,7 @@ public class Model_Client_Address implements GEntity{
             
             if (loJSON != null) {
                 setTownID((String) loJSON.get("sTownIDxx"));
-                setTownName((String) loJSON.get("sTownName") + ", " + (String) loJSON.get("sProvName"));
+                setTownName((String) loJSON.get("sTownName"));
                 
 //                setValue(12, (String) loJSON.get("sTownName"));
 //                setValue(14, (String) loJSON.get("sProvName"));
