@@ -342,20 +342,29 @@ public class Model_Client_Address implements GEntity{
         return psMessage;
     }
         private String getSQL(){
-        return "SELECT" +
-                    ", sAddrssID" +
-                    ", sClientID" +
-                    ", sHouseNox" +
-                    ", sAddressx" +
-                    ", sBrgyIDxx" +
-                    ", sTownIDxx" +
-                    ", nLatitude" +
-                    ", nLongitud" +
-                    ", cPrimaryx" +
-                    ", cRecdStat" +
-                    ", sModified" +
-                    ", dModified" +
-                " FROM " + getTable();
+            return "SELECT " +
+                    "  a.sAddrssID, " +
+                    "  a.sClientID, " +
+                    "  a.sHouseNox, " +
+                    "  a.sAddressx, " +
+                    "  a.sBrgyIDxx, " +
+                    "  a.sTownIDxx, " +
+                    "  a.nLatitude, " +
+                    "  a.nLongitud, " +
+                    "  a.cPrimaryx, " +
+                    "  a.cRecdStat, " +
+                    "  a.dModified, " +
+                    "  b.sTownName    xTownName, " +
+                    "  d.sBrgyName    xBrgyName, " +
+                    "  c.sProvName    xProvName " +
+                    "FROM Client_Address a " +
+                    "  LEFT JOIN TownCity b " +
+                    "    ON a.sTownIDxx = b.sTownIDxx " +
+                    "  LEFT JOIN Province c " +
+                    "    ON b.sProvIDxx = c.sProvIDxx " +
+                    "  LEFT JOIN Barangay d " +
+                    "    ON a.sBrgyIDxx = d.sBrgyIDxx " +
+                    "WHERE a.cRecdStat = '1'";
     }
     private void initialize(){
         
@@ -368,6 +377,8 @@ public class Model_Client_Address implements GEntity{
 
             MiscUtil.initRowSet(poEntity);      
             poEntity.updateInt("cPrimaryx", 1);
+            poEntity.updateDouble("nLatitude", 0.0);
+            poEntity.updateDouble("nLongitud", 0.0);
             poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);
             
             poEntity.insertRow();
@@ -389,6 +400,7 @@ public class Model_Client_Address implements GEntity{
         
         poJSON = new JSONObject();
         poJSON.put("result", "success");
+        poJSON.put("message", "New record success.");
         return poJSON;
     }
 
@@ -396,8 +408,13 @@ public class Model_Client_Address implements GEntity{
     public JSONObject openRecord(String fsValue) {
         poJSON = new JSONObject();
 
-        String lsSQL = MiscUtil.makeSelect(this);
-        lsSQL = MiscUtil.addCondition(lsSQL, "sAddrssID = " + SQLUtil.toSQL(fsValue));
+//        String lsSQL = MiscUtil.makeSelect(this);
+//        lsSQL = MiscUtil.addCondition(lsSQL, "sAddrssID = " + SQLUtil.toSQL(fsValue));
+
+
+        String lsSQL = getSQL();
+        lsSQL = MiscUtil.addCondition(getSQL(), "a.sAddrssID = " + SQLUtil.toSQL(fsValue));
+        System.out.println(lsSQL);
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -519,8 +536,8 @@ public class Model_Client_Address implements GEntity{
         }
         
     }
-    public JSONObject SearchBarangay(String fsValue, boolean fbByCode){
-        String lsSQL = "SELECT " +
+    public JSONObject SearchBarangay(String fsValue, boolean fbByCode) {
+      String lsSQL = "SELECT " +
                             "  a.sBrgyIDxx" +
                             ", a.sBrgyName" +
                             ", b.sTownName" + 
@@ -535,30 +552,40 @@ public class Model_Client_Address implements GEntity{
                             " AND b.sProvIDxx = c.sProvIDxx" + 
                             " AND a.cRecdStat = '1'" + 
                             " AND b.cRecdStat = '1'" + 
-                            " AND c.cRecdStat = '1'";
+                            " AND c.cRecdStat = '1'" + 
+                            " AND a.sTownIDxx = " + SQLUtil.toSQL(getTownID());
         
-        if (fbByCode){
+        if (fbByCode)
             lsSQL = MiscUtil.addCondition(lsSQL, "a.sBrgyIDxx = " + SQLUtil.toSQL(fsValue));
+        else
+            lsSQL = MiscUtil.addCondition(lsSQL, "a.sBrgyName LIKE " + SQLUtil.toSQL(fsValue + "%"));
+       
             
-            ResultSet loRS = poGRider.executeQuery(lsSQL);
+      
+        JSONObject loJSON;
             
-            return ShowDialogFX.Browse(poGRider, 
-                                            loRS, 
-                                            "ID»Barangay»Town»Province", 
-                                            "sBrgyIDxx»sBrgyName»sTownName»sProvName");
-        }
-        
-        return ShowDialogFX.Search(poGRider, 
-                                        lsSQL, 
-                                        fsValue, 
-                                        "ID»Barangay»Town»Province", 
-                                        "sBrgyIDxx»sBrgyName»sTownName»sProvName", 
-                                        "a.sBrgyIDxx»a.sBrgyName»b.sTownName»c.sProvName", 
-                                        1);
+            
+        loJSON = ShowDialogFX.Search(poGRider, 
+                            lsSQL, 
+                            fsValue,
+                            "ID»Barangay»Town»Province", 
+                            "sBrgyIDxx»sBrgyName»sTownName»sProvName",
+                            "sBrgyIDxx»sBrgyName»sTownName»sProvName",
+                            fbByCode ? 0 : 1);
+            
+            if (loJSON != null) {
+                setBarangayID((String) loJSON.get("sBrgyIDxx"));
+                loJSON.put("result", "success");
+                loJSON.put("message", "Search barangay success.");
+                return loJSON;
+            }else {
+                loJSON.put("result", "success");
+                loJSON.put("message", "No record selected.");
+                return loJSON;
+            }
     }
-    
-    public JSONObject SearchTown(String fsValue, boolean fbByCode){
-        String lsSQL = "SELECT " +
+    public JSONObject SearchTown(String fsValue, boolean fbByCode) {
+       String lsSQL = "SELECT " +
                             "  a.sTownIDxx" +
                             ", a.sTownName" + 
                             ", a.sZippCode" +
@@ -569,25 +596,35 @@ public class Model_Client_Address implements GEntity{
                         " WHERE a.sProvIDxx = b.sProvIDxx" + 
                             " AND a.cRecdStat = '1'";
         
-        if (fbByCode){
+        if (fbByCode)
             lsSQL = MiscUtil.addCondition(lsSQL, "a.sTownIDxx = " + SQLUtil.toSQL(fsValue));
+        else
+            lsSQL = MiscUtil.addCondition(lsSQL, "a.sTownName LIKE " + SQLUtil.toSQL(fsValue + "%"));
+       
             
-            ResultSet loRS = poGRider.executeQuery(lsSQL);
-            
-            return ShowDialogFX.Browse(poGRider, 
-                                            loRS, 
-                                            "ID»Town»Postal Code»Province", 
-                                            "sTownIDxx»sTownName»sZippCode»sProvName");
-        }
+      
+        JSONObject loJSON;
         
-        return ShowDialogFX.Search(poGRider, 
-                                        lsSQL, 
-                                        fsValue, 
-                                        "ID»Town»Postal Code»Province", 
-                                        "sTownIDxx»sTownName»sZippCode»sProvName", 
-                                        "a.sTownIDxx»a.sTownName»a.sZippCode»b.sProvName", 
-                                        1);
+        loJSON = ShowDialogFX.Search(poGRider, 
+                            lsSQL, 
+                            fsValue,
+                            "ID»Town»Postal Code»Province", 
+                            "sTownIDxx»sTownName»sZippCode»sProvName", 
+                            "a.sTownIDxx»a.sTownName»a.sZippCode»b.sProvName", 
+                            fbByCode ? 0 : 1);
+            
+            if (loJSON != null) {
+                setTownID((String) loJSON.get("sTownIDxx"));
+                loJSON.put("result", "success");
+                loJSON.put("message", "Search town success.");
+                return loJSON;
+            }else {
+                loJSON.put("result", "success");
+                loJSON.put("message", "No record selected.");
+                return loJSON;
+            }
     }
+    
 
     @Override
     public int getEditMode() {
