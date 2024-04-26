@@ -35,14 +35,14 @@ public class Model_Client_Address implements GEntity{
     int pnEditMode;
     public JSONObject poJSON;
     
-    public Model_Client_Address(Connection foValue, GRider poValue){
-        if (foValue == null){
+    public Model_Client_Address(GRider poValue){
+        if (poValue.getConnection() == null){
             System.err.println("Database connection is not set.");
             System.exit(1);
         }
         pnEditMode = EditMode.UNKNOWN;
         poGRider = poValue;
-        poConn = foValue;
+        poConn = poGRider.getConnection();
         
         initialize();
     }
@@ -547,7 +547,7 @@ public class Model_Client_Address implements GEntity{
                     poJSON.put("message", "No record to save.");
                 }
             } else {
-                Model_Client_Address loOldEntity = new Model_Client_Address(poConn, poGRider);
+                Model_Client_Address loOldEntity = new Model_Client_Address(poGRider);
                 
                 setModifiedDate(poGRider.getServerDate());
                 //replace with the primary key column info

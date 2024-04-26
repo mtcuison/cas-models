@@ -37,14 +37,14 @@ public class Model_Client_Master implements GEntity{
     GRider poGRider;
     int pnEditMode;
     public JSONObject poJSON;
-    public Model_Client_Master(Connection foValue, GRider poValue){
-        if (foValue == null){
+    public Model_Client_Master(GRider poValue){
+        if (poValue.getConnection() == null){
             System.err.println("Database connection is not set.");
             System.exit(1);
         }
         pnEditMode = EditMode.UNKNOWN;
         poGRider = poValue;
-        poConn = foValue;
+        poConn = poGRider.getConnection();
         
         
         initialize();
@@ -721,7 +721,7 @@ public class Model_Client_Master implements GEntity{
                     poJSON.put("message", "No record to save.");
                 }
             } else {
-                Model_Client_Master loOldEntity = new Model_Client_Master(poConn, poGRider);
+                Model_Client_Master loOldEntity = new Model_Client_Master(poGRider);
                 
                 //replace with the primary key column info
                 JSONObject loJSON = loOldEntity.openRecord(this.getClientID());
