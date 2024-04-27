@@ -11,20 +11,11 @@
         <exec.mainClass>org.guanzon.clients.CasModels</exec.mainClass>
     </properties>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.24</version>
-        </dependency>
-        
         <dependency>
             <groupId>org.guanzon</groupId>
             <artifactId>appdriver-base</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        
-        
         <dependency>
             <groupId>org.guanzon</groupId>
             <artifactId>appdriver-agent</artifactId>
