@@ -239,6 +239,23 @@ public class Model_Client_Master implements GEntity{
     }
     
     /**
+     * Sets the complete name of the client.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public JSONObject setMaidenName(String fsValue){
+        return setValue("sMaidenNm", fsValue);
+    }
+    
+    /**
+     * @return The complete name of the client.
+     */
+    public String getMaidenName(){
+        return (String) getValue("sMaidenNm");
+    }
+    
+    /**
      * Set the sex of the client.<br>
      * 0 for Male
      * 1 for Female
@@ -440,6 +457,41 @@ public class Model_Client_Master implements GEntity{
     }
     
     /**
+     * Sets the LTO identification number of the client.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public JSONObject setLTOIDNumber(String fsValue){
+        return setValue("sLTOIDxxx", fsValue);
+    }
+    
+    /**
+     * @return The LTO identification number of the client.
+     */
+    public String getLTOIDNumber(){
+        return (String) getValue("sLTOIDxxx");
+    }
+    
+    
+    /**
+     * Sets the Philippines national identification number of the client.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public JSONObject setPHNationalIDNumber(String fsValue){
+        return setValue("sPHBNIDxx", fsValue);
+    }
+    
+    /**
+     * @return The Philippines national identification number of the client.
+     */
+    public String getPHNationalIDNumber(){
+        return (String) getValue("sPHBNIDxx");
+    }
+    
+    /**
      * Sets if the client has loan to the company.
      * 
      * @param fbValue 
@@ -608,11 +660,12 @@ public class Model_Client_Master implements GEntity{
                 ", a.cRecdStat" +
                 ", a.sModified" +
                 ", a.dModified" +
-                ", b.sTownName xBirthPlc" +
+                ", CONCAT(b.sTownName, ', ', e.sProvName) AS xBirthPlc" +
                 ", c.sCntryNme xCitizenx" +
                 ", d.sCompnyNm xSpouseNm" +
                 " FROM " + getTable() + " a" +
                             " LEFT JOIN TownCity b ON a.sBirthPlc = b.sTownIDxx" +
+                            " LEFT JOIN Province e ON b.sProvIDxx = e.sProvIDxx" +
                             " LEFT JOIN Country c ON a.sCitizenx = c.sCntryCde" +
                             " LEFT JOIN Client_Master d ON a.sSpouseID = d.sClientID" +
                         " WHERE a.cRecdStat = '1'";
@@ -675,7 +728,7 @@ public class Model_Client_Master implements GEntity{
             if (loRS.next()){
                 for (int lnCtr = 1; lnCtr <= loRS.getMetaData().getColumnCount(); lnCtr++){
                     setValue(lnCtr, loRS.getObject(lnCtr));
-                    System.out.println(loRS.getMetaData().getColumnName(lnCtr) + " = " + loRS.getString(lnCtr));
+                    System.out.println(loRS.getMetaData().getColumnLabel(lnCtr) + " = " + loRS.getString(lnCtr));
                 }
 
                 pnEditMode = EditMode.UPDATE;
@@ -686,6 +739,7 @@ public class Model_Client_Master implements GEntity{
                 poJSON.put("result", "error");
                 poJSON.put("message", "No record to load.");
             }
+            MiscUtil.close(loRS);
         } catch (SQLException e) {
             poJSON.put("result", "error");
             poJSON.put("message", e.getMessage());

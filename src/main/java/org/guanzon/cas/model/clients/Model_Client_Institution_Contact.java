@@ -418,7 +418,7 @@ public class Model_Client_Institution_Contact implements GEntity{
     
     private String getSQL(){
         return "SELECT" +
-                    ", sContctID" +
+                    " sContctID" +
                     ", sClientID" +
                     ", sCPerson1" +
                     ", sCPPosit1" +
@@ -430,8 +430,8 @@ public class Model_Client_Institution_Contact implements GEntity{
                     ", sAccount2" +
                     ", sAccount3" +
                     ", sRemarksx" +
+                    ", IFNULL(cPrimaryx,'0') cPrimaryx" +
                     ", cRecdStat" +
-                    ", sModified" +
                     ", dModified" +
                 " FROM " + getTable();
     }
@@ -448,7 +448,7 @@ public class Model_Client_Institution_Contact implements GEntity{
             
             list();
             poEntity.updateString("sContctID", MiscUtil.getNextCode(getTable(), "sContctID", true, poConn, poGRider.getBranchCode()));
-//            poEntity.updateString("cPrimaryx", Logical.NO);
+            poEntity.updateString("cPrimaryx", Logical.NO);
 //            setPrimary(false);
             poEntity.updateString("cRecdStat", Logical.YES);
             poEntity.insertRow();
@@ -478,9 +478,12 @@ public class Model_Client_Institution_Contact implements GEntity{
     public JSONObject openRecord(String fsValue) {
         poJSON = new JSONObject();
 
-        String lsSQL = MiscUtil.makeSelect(this);
-        lsSQL = MiscUtil.addCondition(lsSQL, "sContctID = " + SQLUtil.toSQL(fsValue));
+//        String lsSQL = MiscUtil.makeSelect(this);
+//        lsSQL = MiscUtil.addCondition(lsSQL, "sContctID = " + SQLUtil.toSQL(fsValue));
 
+
+        String lsSQL = getSQL();
+        lsSQL = MiscUtil.addCondition(getSQL(), "sContctID = " + SQLUtil.toSQL(fsValue));
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
         try {
@@ -497,6 +500,7 @@ public class Model_Client_Institution_Contact implements GEntity{
                 poJSON.put("result", "error");
                 poJSON.put("message", "No record to load.");
             }
+            MiscUtil.close(loRS);
         } catch (SQLException e) {
             poJSON.put("result", "error");
             poJSON.put("message", e.getMessage());
