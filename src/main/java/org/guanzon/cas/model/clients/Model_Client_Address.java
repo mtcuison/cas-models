@@ -457,7 +457,7 @@ public class Model_Client_Address implements GEntity{
             poEntity.moveToInsertRow();
 
             MiscUtil.initRowSet(poEntity);      
-            poEntity.updateInt("cPrimaryx", 1);
+            poEntity.updateInt("cPrimaryx", 0);
             poEntity.updateDouble("nLatitude", 0.0);
             poEntity.updateDouble("nLongitud", 0.0);
             poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);

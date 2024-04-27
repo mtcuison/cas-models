@@ -321,6 +321,7 @@ public class Model_Client_Social_Media implements GEntity{
                 poJSON.put("result", "error");
                 poJSON.put("message", "No record to load.");
             }
+            MiscUtil.close(loRS);
         } catch (SQLException e) {
             poJSON.put("result", "error");
             poJSON.put("message", e.getMessage());

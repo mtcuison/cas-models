@@ -68,10 +68,21 @@ public class Model_Client_Mail implements GEntity{
         return -1;
     }
 
+    /**
+     * Gets the total number of column.
+     * @return total number of column
+     */
     @Override
     public int getColumnCount() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            return poEntity.getMetaData().getColumnCount(); 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return -1;
     }
+
 
     /** 
      * this is your table name
@@ -298,6 +309,7 @@ public class Model_Client_Mail implements GEntity{
                 poJSON.put("result", "error");
                 poJSON.put("message", "No record to load.");
             }
+            MiscUtil.close(loRS);
         } catch (SQLException e) {
             poJSON.put("result", "error");
             poJSON.put("message", e.getMessage());
@@ -406,23 +418,33 @@ public class Model_Client_Mail implements GEntity{
 //        }
 //        return poJSON;
     }
+    
+    /**
+     * Sets column value.
+     * 
+     * @param fnColumn - column index number
+     * @param foValue - value
+     * @return result as success/failed
+     */
     @Override
-    public JSONObject setValue(int lnColumn, Object foValue) {
-        
-            poJSON = new JSONObject();
-        try {
-            poEntity.updateObject(lnColumn, foValue);
+    public JSONObject setValue(int fnColumn, Object foValue) {
+        try {              
+            poJSON = MiscUtil.validateColumnValue(System.getProperty("sys.default.path.metadata") + XML, MiscUtil.getColumnLabel(poEntity, fnColumn), foValue);
+            if ("error".equals((String) poJSON.get("result"))) return poJSON;
+            
+            poEntity.updateObject(fnColumn, foValue);
             poEntity.updateRow();
+            
+            poJSON = new JSONObject();
             poJSON.put("result", "success");
-            poJSON.put("value", getValue(lnColumn));
-            return poJSON;
+            poJSON.put("value", getValue(fnColumn));
         } catch (SQLException e) {
             e.printStackTrace();
-            psMessage = e.getMessage();
             poJSON.put("result", "error");
             poJSON.put("message", e.getMessage());
-            return poJSON;
         }
+        
+        return poJSON;
     }
 
     @Override

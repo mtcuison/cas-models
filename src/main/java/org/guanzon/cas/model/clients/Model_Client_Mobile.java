@@ -409,6 +409,7 @@ public class Model_Client_Mobile implements GEntity{
         String lsSQL = MiscUtil.makeSelect(this);
         lsSQL = MiscUtil.addCondition(lsSQL, "sMobileID = " + SQLUtil.toSQL(fsValue));
 
+        System.out.println(lsSQL);
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
         try {
@@ -422,9 +423,11 @@ public class Model_Client_Mobile implements GEntity{
                 poJSON.put("result", "success");
                 poJSON.put("message", "Record loaded successfully.");
             } else {
+                
                 poJSON.put("result", "error");
                 poJSON.put("message", "No record to load.");
             }
+            MiscUtil.close(loRS);
         } catch (SQLException e) {
             poJSON.put("result", "error");
             poJSON.put("message", e.getMessage());
@@ -479,7 +482,7 @@ public class Model_Client_Mobile implements GEntity{
                             poJSON.put("message", poGRider.getErrMsg());
                         }
                     } else {
-                        poJSON.put("result", "success");
+                        poJSON.put("result", "error");
                         poJSON.put("message", "No updates has been made.");
                     }
                 } else {
