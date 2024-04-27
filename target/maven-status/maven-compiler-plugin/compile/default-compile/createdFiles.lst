@@ -1,6 +1,7 @@
 org\guanzon\cas\model\clients\Model_Client_Address.class
-org\guanzon\cas\model\clients\Model_Client_Master.class
 org\guanzon\cas\model\clients\Model_Client_Mobile.class
-org\guanzon\cas\model\clients\Model_Client_Institution_Contact.class
 org\guanzon\cas\model\clients\Model_Client_Social_Media.class
+org\guanzon\cas\model\clients\Model_Client_Master.class
+org\guanzon\cas\model\clients\Model_Client_Institution_Contact.class
 org\guanzon\cas\model\clients\Model_Client_Mail.class
+org\guanzon\cas\models\Model_Supplier_Accreditation.class
