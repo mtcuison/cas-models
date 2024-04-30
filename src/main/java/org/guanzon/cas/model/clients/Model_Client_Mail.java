@@ -363,7 +363,8 @@ public class Model_Client_Mail implements GEntity{
                             poJSON.put("message", poGRider.getErrMsg());
                         }
                     } else {
-                        poJSON.put("result", "success");
+                        poJSON.put("result", "error");
+                        poJSON.put("continue", true);
                         poJSON.put("message", "No updates has been made.");
                     }
                 } else {

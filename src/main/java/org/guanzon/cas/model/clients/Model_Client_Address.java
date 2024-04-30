@@ -16,6 +16,7 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
@@ -433,6 +434,14 @@ public class Model_Client_Address implements GEntity{
                     "  a.nLatitude, " +
                     "  a.nLongitud, " +
                     "  a.cPrimaryx, " +
+                    "  a.cOfficexx, " +
+                    "  a.cProvince, " +
+                    "  a.cBillingx, " +
+                    "  a.cShipping, " +
+                    "  a.cCurrentx, " +
+                    "  a.cLTMSAddx, " +
+                    "  a.sSourceCd, " +
+                    "  a.sReferNox, " +
                     "  a.cRecdStat, " +
                     "  a.dModified, " +
                     "  b.sTownName    xTownName, " +
@@ -457,7 +466,13 @@ public class Model_Client_Address implements GEntity{
             poEntity.moveToInsertRow();
 
             MiscUtil.initRowSet(poEntity);      
-            poEntity.updateInt("cPrimaryx", 0);
+            poEntity.updateString("cOfficexx", Logical.NO);
+            poEntity.updateString("cProvince", Logical.NO);
+            poEntity.updateString("cBillingx", Logical.NO);
+            poEntity.updateString("cShipping", Logical.NO);
+            poEntity.updateString("cCurrentx", Logical.NO);
+            poEntity.updateString("cLTMSAddx", Logical.NO);
+            poEntity.updateString("cPrimaryx", Logical.NO);
             poEntity.updateDouble("nLatitude", 0.0);
             poEntity.updateDouble("nLongitud", 0.0);
             poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);
@@ -566,7 +581,8 @@ public class Model_Client_Address implements GEntity{
                             poJSON.put("message", poGRider.getErrMsg());
                         }
                     } else {
-                        poJSON.put("result", "success");
+                        poJSON.put("result", "error");
+                        poJSON.put("continue", true);
                         poJSON.put("message", "No updates has been made.");
                     }
                 } else {
