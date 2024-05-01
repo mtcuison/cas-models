@@ -472,7 +472,7 @@ public class Model_Client_Mobile implements GEntity{
                 setMobileNetwork(CommonUtils.classifyNetwork(getContactNo()));
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sMobileID = " + SQLUtil.toSQL(this.getClientID()));
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sMobileID = " + SQLUtil.toSQL(this.getMobileID()));
                     
                     if (!lsSQL.isEmpty()){
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){

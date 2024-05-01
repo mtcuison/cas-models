@@ -363,7 +363,7 @@ public class Model_Client_Social_Media implements GEntity{
                 
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSocialID = " + SQLUtil.toSQL(this.getClientID()));
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSocialID = " + SQLUtil.toSQL(this.getSocialID()));
                     
                     if (!lsSQL.isEmpty()){
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){

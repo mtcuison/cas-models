@@ -570,7 +570,7 @@ public class Model_Client_Address implements GEntity{
                 
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sAddrssID = " + SQLUtil.toSQL(this.getAddress()), "xBrgyName»xTownName»xProvName");
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sAddrssID = " + SQLUtil.toSQL(this.getAddressID()), "xBrgyName»xTownName»xProvName");
                     
                     if (!lsSQL.isEmpty()){
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
@@ -682,7 +682,7 @@ public class Model_Client_Address implements GEntity{
                 loJSON.put("message", "Search barangay success.");
                 return loJSON;
             }else {
-                loJSON.put("result", "success");
+                loJSON.put("result", "error");
                 loJSON.put("message", "No record selected.");
                 return loJSON;
             }
@@ -728,7 +728,7 @@ public class Model_Client_Address implements GEntity{
 //                loJSON.put("message", "Search town success.");
                 return loJSON;
             }else {
-                loJSON.put("result", "success");
+                loJSON.put("result", "error");
                 loJSON.put("message", "No record selected.");
                 return loJSON;
             }
