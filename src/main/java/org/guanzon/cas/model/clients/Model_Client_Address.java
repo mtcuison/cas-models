@@ -637,6 +637,25 @@ public class Model_Client_Address implements GEntity{
         
     }
     public JSONObject SearchBarangay(String fsValue, boolean fbByCode) {
+        
+        JSONObject loJSON;
+        if (fbByCode){
+            if (fsValue.equals((String) getBarangayID())) {
+                loJSON = new JSONObject();
+                loJSON.put("result", "success");
+                loJSON.put("message", "Search barangay success.");
+                return loJSON;
+            }
+        }else{
+            if(getValue(21)!= null && !getValue(21).toString().trim().isEmpty()){
+                if (fsValue.equals(getValue(21))){
+                    loJSON = new JSONObject();
+                    loJSON.put("result", "success");
+                    loJSON.put("message", "Search barangay success.");
+                    return loJSON;
+                }
+            }
+        }
       String lsSQL = "SELECT " +
                             "  a.sBrgyIDxx" +
                             ", a.sBrgyName" +
@@ -661,8 +680,6 @@ public class Model_Client_Address implements GEntity{
             lsSQL = MiscUtil.addCondition(lsSQL, "a.sBrgyName LIKE " + SQLUtil.toSQL(fsValue + "%"));
        
             
-      
-        JSONObject loJSON;
             
             
         loJSON = ShowDialogFX.Search(poGRider, 
@@ -688,6 +705,28 @@ public class Model_Client_Address implements GEntity{
             }
     }
     public JSONObject SearchTown(String fsValue, boolean fbByCode) {
+        
+        JSONObject loJSON;
+        if (fbByCode){
+            if (fsValue.equals((String) getTownID())) {
+                loJSON = new JSONObject();
+                loJSON.put("result", "success");
+                loJSON.put("message", "Search town success.");
+                return loJSON;
+            }
+        }else{
+            
+            String townProvince = getValue(20) + ", " + getValue(22);
+            System.out.println("fsValue = " + fsValue);
+            System.out.println("townProvince = " + townProvince);
+            if (fsValue.equals(townProvince)){
+                loJSON = new JSONObject();
+                loJSON.put("result", "success");
+                loJSON.put("message", "Search town success.");
+                return loJSON;
+            }
+        }
+        
        String lsSQL = "SELECT " +
                             "  a.sTownIDxx" +
                             ", a.sTownName" + 
@@ -706,7 +745,7 @@ public class Model_Client_Address implements GEntity{
        
             
       
-        JSONObject loJSON;
+        System.out.println("lsSQL Town = " + lsSQL);
         
         loJSON = ShowDialogFX.Search(poGRider, 
                             lsSQL, 
@@ -715,14 +754,14 @@ public class Model_Client_Address implements GEntity{
                             "sTownIDxx»sTownName»sZippCode»sProvName", 
                             "a.sTownIDxx»a.sTownName»a.sZippCode»b.sProvName", 
                             fbByCode ? 0 : 1);
+        System.out.println("loJSON Town = " + loJSON);
             
             if (loJSON != null) {
                 setTownID((String) loJSON.get("sTownIDxx"));
                 setTownName((String) loJSON.get("sTownName"));
-                
-//                setValue(12, (String) loJSON.get("sTownName"));
-//                setValue(14, (String) loJSON.get("sProvName"));
                 setProvinceName((String) loJSON.get("sProvName"));
+                setBarangayID("");
+                setBarangayName("");
                 loJSON.put("result", "success");
                 loJSON.put("message", "Search town success.");
 //                loJSON.put("message", "Search town success.");
